@@ -1,6 +1,5 @@
 ---
 title: Contact
 ---
-
-I live in a small hut in the mountains of Kumano Kodō on Kii Hantō and would not
-like to be contacted.
+You might find me on the #haskell or #haskell-beginners IRC channels as contiver.
+Alternatively, my email is my first name and surname at gmail dot com.

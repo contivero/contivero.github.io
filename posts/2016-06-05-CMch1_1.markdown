@@ -1,0 +1,125 @@
+---
+title: Concrete Mathematics, Chapter 1, warmups
+---
+
+## Exercise 1:
+
+The demo doesn't cover one of the base cases. The case n = 1 is fine, but it is
+missing n = 2, since to talk about a "middle horse" as it does during the
+inductive step, there must be at least three horses, so we haven't established
+anything for the case n = 2.
+
+## Exercise 2:
+
+If we have no disks, we do no moves, so $X_0 = 0$.
+Playing a bit gives us the following initial values:
+$X_1 = 2, X_2 = 8, X_3 = 26$
+It is harder to notice from the values alone, but manually following the steps
+gives us the following ideas:
+
+After half the steps we built the tower in the middle peg (not relevant, but
+worth noting).  To be able to move the nth (bottom) disc to the middle peg, we
+need to build the tower $T_{n-1}$ of size (n-1) on B. Then we move
+$T_{n-1}$ back to A, move the bottom disc to B, and finally move $T_{n-1}$ back
+to A. In summary, the steps needed to move the tower of size n from A to B are
+$X_n = 3X_{n-1}+2$
+
+To find a closed form, we define $U_n = X_n + 1$, so that we can eliminate the
+$(+2)$ from the equation.
+
+$$
+\begin{aligned}
+U_n&= X_n + 1 \\
+&=(3X_{n-1}+2) + 1 = (3(U_{n-1}-1)+2)+1 = 3U_{n-1}
+\end{aligned}
+$$
+
+We see that $U_n = 3^n \therefore X_n = 3^n - 1$
+
+## Exercise 3:
+
+We prove it by induction on the amount of discs.
+Base case (h = 1):
+We start from A, go through C, and finish in B. There is not other possible arrangement than these three.
+
+Inductive hypothesis (h = n):
+We pass through all the properly stacked arrangements of the tower of size n, $T_n$.
+
+Proof (h = n+1):
+We take $T_n$, and move them to B. By the inductive hypothesis, we pass through all the possible properly stacked arrangements of size n, with the bottom (n+1) disc on A. We move the bottom disc to C, and move $T_n$ to A, once again passing through all the properly stacked arrangements with the bottom disk on C, by the inductive hypothesis. Finally, we move the bottom disk to B, and move $T_n$ back to B, and again by the inductive hypothesis we pass through all the possible properly stacked arrangements of $T_n$.
+
+Recapitulating, we passed through all the properly stacked arrangements of $T_n$ with the bottom disc on A, C, and B. Therefore, we passed through all the properly stacked arrangements of $T_{n+1}$.
+
+## Exercise 4:
+
+Trivially no, since it was proved in the chapter that $T_n = 2^n - 1$, so
+whatever amount of moves we need, it is not going to be more than that. In other
+words, what the book answers say.
+
+## Exercise 5:
+
+For no circle, we have a single region, i.e. $C_0 = 1$. For a single circle we
+have the area inside and outside, so $C_1 = 2$. For the rest:
+
+![$C_2 = 4$](/images/venn21.png)
+
+![$C_3 = 8$](/images/venn31.png)
+
+![$C_4 = 14$](/images/venn41.png)
+
+We would need $C_4$ to be $16$, but that is not the case.
+Each circle we add intersects the other circles in two places, creating two regions, meaning we have the following recurrence relation:
+$$
+\begin{aligned}
+C_1 &=2\\
+C_n &= C_{n-1} + 2(n-1)
+\end{aligned}
+$$
+If we unfold a couple of terms, we see we can rewrite $C_n$ in closed form:
+$$
+\begin{aligned}
+C_n &= C_{n-1} + 2(n-1)\\
+&=C_{n-2} + 2(n-2) + 2(n-1)\\
+& \enspace \vdots \\
+&=C_1 +2 +4 + \dots + 2(n-2) + 2(n-1) \\
+&= C_1+2S_{n-1} = 2 + 2\frac{n(n-1)}{2} = n^2 -n + 2
+\end{aligned}
+$$
+
+## Exercise 6:
+
+We can easily see that we need at least 3 lines to form an enclosed region, so:
+$B_0 = 0, B_1 = 0, B_2 = 0$ From there on, we see a couple more:
+
+![$B_3 = 1$](/images/ch1_ex6_b3.png)
+
+![$B_4 = 3$](/images/ch1_ex6_b4.png)
+
+![$B_5 = 6$](/images/ch1_ex6_b5.png)
+
+![$B_6 = 10$](/images/ch1_ex6_b6.png)
+
+After playing with this, we see that parallel lines are useless. The number of
+enclosed regions is a function of the number of distinct points where lines
+intersect. If the new line intersects the rest in $k$ points, it generates $(k-1)$
+regions. If we had $(n-1)$ lines and add the nth one, we have all the previous
+bounded regions, plus at most $(n-2)$ new ones.
+Then, we have $B_n = B_{n-1} + (n-2), \forall n \geqslant 2$. If we unfold the
+terms, we notice a triangular number sequence, and can rewrite it in closed
+form:
+
+$$
+\begin{aligned}
+B_n &= B_{n-1} + (n-2) \\
+&= B_{n-2} + (n-3) + (n-2) \\
+& \enspace \vdots \\
+&= B_2 + 1 + 2 + \dots + (n-2)\\
+&= 0 + S_{n-2} = (n-1)(n-2)/2\\
+\end{aligned}
+$$
+
+## Exercise 7:
+
+If we try to prove it by induction, we need to start from $n = 1$ (since $J(n)$
+is not defined for 0), and we will quickly find that
+$H(1) = J(2) - J(1) = 0 \neq 2$

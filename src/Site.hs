@@ -1,29 +1,33 @@
---------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Monoid (mappend)
-import           Hakyll
+
+import Data.Monoid ((<>))
+import Hakyll
+import Site.Compilers
 
 
---------------------------------------------------------------------------------
-main :: IO ()
-main = hakyll $ do
+static :: Rules ()
+static = do
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
-
-    match "css/*" $ do
+    match "css/main.scss" $ do
+        route   (setExtension "css")
+        compile sassCompiler
+    match "js/*" $ do
         route   idRoute
-        compile compressCssCompiler
-
+        compile copyFileCompiler
     match (fromList ["about.rst", "contact.markdown"]) $ do
-        route   $ setExtension "html"
-        compile $ pandocCompiler
+        route   (setExtension "html")
+        compile $ pandocMathCompiler
             >>= loadAndApplyTemplate "templates/default.html" defaultContext
             >>= relativizeUrls
 
+main :: IO ()
+main = hakyll $ do
+    static
     match "posts/*" $ do
         route $ setExtension "html"
-        compile $ pandocCompiler
+        compile $ pandocMathCompiler
             >>= loadAndApplyTemplate "templates/post.html"    postCtx
             >>= loadAndApplyTemplate "templates/default.html" postCtx
             >>= relativizeUrls
@@ -33,8 +37,8 @@ main = hakyll $ do
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let archiveCtx =
-                    listField "posts" postCtx (return posts) `mappend`
-                    constField "title" "Archives"            `mappend`
+                    listField "posts" postCtx (return posts) <>
+                    constField "title" "Archives"            <>
                     defaultContext
 
             makeItem ""
@@ -47,10 +51,9 @@ main = hakyll $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
-            let indexCtx =
-                    listField "posts" postCtx (return posts) `mappend`
-                    constField "title" "Home"                `mappend`
-                    defaultContext
+            let indexCtx = listField "posts" postCtx (return posts)
+                        <> constField "title" "Home"
+                        <> defaultContext
 
             getResourceBody
                 >>= applyAsTemplate indexCtx
@@ -59,10 +62,5 @@ main = hakyll $ do
 
     match "templates/*" $ compile templateCompiler
 
-
---------------------------------------------------------------------------------
 postCtx :: Context String
-postCtx =
-    dateField "date" "%B %e, %Y" `mappend`
-    defaultContext
-
+postCtx = dateField "date" "%B %e, %Y" <> defaultContext

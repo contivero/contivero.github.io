@@ -1,0 +1,323 @@
+/* default */
+body {
+    color: black;
+    margin: 0 auto;
+}
+
+div#header {
+    margin-bottom: 2em;
+    padding: 12px 0;
+    background: #222;
+}
+
+div#logo a {
+    color: black;
+    float: left;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+div#header #navigation {
+    text-align: right;
+    display: flex;
+    justify-content: space-between;
+}
+
+div#header #navigation a {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 12px;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+div#footer {
+    border-top: solid 2px black;
+    color: #555;
+    font-size: 12px;
+    margin-top: 30px;
+    padding: 12px 0;
+    text-align: right;
+}
+
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.7rem; }
+
+div.info {
+    color: #555;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.figure img {
+    max-width: 75%;
+    display: block;
+    margin: 10px auto;
+}
+
+.figure p {
+    text-align: center;
+    font-style: italic;
+}
+/* typography */
+pre { padding: 5px; }
+pre, code {
+    font-family: "Source Code Pro", Inconsolata, "Lucida Console", Terminal, "Courier New", monospace;
+}
+
+
+/* syntax */
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+}
+td.lineNumbers {
+    border-right: solid 1px #aaa;
+    text-align: right; 
+    color: #aaa; 
+    padding-right: .4em;
+    padding-left: .4em;
+}
+td.sourceCode {
+    padding-left: .4em;
+}
+
+$contrast-green: #162;
+$contrast-red: #a20;
+$contrast-blue: #13c;
+$contrast-brown: #650; // #40a070
+
+pre.sourceCode span.kw { color: $contrast-green; font-weight: bold; } 
+pre.sourceCode span.dt { color: $contrast-red; }
+pre.sourceCode span.dv { color: $contrast-brown; }
+pre.sourceCode span.bn { color: $contrast-brown; }
+pre.sourceCode span.fl { color: $contrast-brown; }
+pre.sourceCode span.ch { color: $contrast-brown; }
+pre.sourceCode span.st { color: $contrast-brown; }
+pre.sourceCode span.co { color: #60a0b0; font-style: italic; }
+pre.sourceCode span.ot { color: $contrast-green; }
+pre.sourceCode span.al { color: red; font-weight: bold; }
+pre.sourceCode span.fu { color: $contrast-blue; }
+pre.sourceCode span.re { }
+pre.sourceCode span.er { color: red; font-weight: bold; }
+
+/* custom */
+.container {
+    padding-top: 60px;
+}
+
+nav {
+    position: fixed;
+    width: 160px; 
+}
+
+nav ul {
+    float: left;  }
+nav ul li {
+    display: block;
+    margin-bottom: 10px; }
+nav ul li a,
+nav ul li a:visited,
+nav ul li a:active  {
+    font-size: 14px;
+    color: #555;
+    text-decoration: none;
+    font-weight: bold; }
+nav ul li a:hover,
+nav ul li a:focus {
+    color: #222; }
+
+.hidden-code a {
+    font-size: 12px;
+    color: #999; }
+.hidden-code>div {
+    display: none; }
+
+#logo {
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+}
+
+/* Mobile */
+@media only screen and (max-width: 767px) {
+    header h1 { font-size: 34px; line-height: 37px; }
+    nav { position: relative; }
+    nav ul,
+    #logo { text-align: left; }
+    #examples .four.columns {
+        padding-top: 30px;
+    }
+}
+
+/* Non 960 */
+@media only screen and (max-width: 959px) {
+    #logo {
+        margin-bottom: 15px; }
+    nav .button {
+        padding: 9px 20px 11px; }
+}
+
+/* iPad Portrait/Browser */
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+    nav {
+        width: 124px; }
+}
+
+/* Mobile/Browser */
+@media only screen and (max-width: 767px) {}
+
+/* Mobile Landscape/Browser */
+@media only screen and (min-width: 480px) and (max-width: 767px) {}
+
+/* Anything smaller than standard 960 */
+@media only screen and (max-width: 959px) {}
+
+
+/* iPad Portrait Only */
+@media only screen and (min-width: 768px) and (max-width: 959px) and (max-device-width: 1000px) {}
+
+/* Mobile Only */
+@media only screen and (max-width: 767px) and (max-device-width: 1000px) {}
+
+/* Mobile Landscape Only */
+@media only screen and (min-width: 480px) and (max-width: 767px) and (max-device-width: 1000px) {}
+
+/* Anything smaller than standard 960 on a device */
+@media only screen and (max-width: 959px) and (max-device-width: 1000px) {
+    .resize { display: none; }
+}
+
+table{
+    background: #fff;
+    border: solid 2px #ccc;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th, td{
+    border: solid 1px #ccc;
+    padding: 3px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+tr.even td {
+    background: #f7f7f7;
+}
+
+th {
+    background:#edeff0;
+}
+
+.tikz_verybig {
+    width: 400px;
+    height: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.tikz_big {
+    width: 200px;
+    height: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.tikz_small {
+    width: 150px;
+    height: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.highlight {
+    margin-bottom: 20px;
+}
+
+div > pre.sourceCode {
+    margin: 1em auto;
+    padding-left: 1em;
+    border-left: solid 1px #ccc;
+}
+
+p img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+}
+
+sup {
+    vertical-align: super;
+    font-size: 8pt;
+}
+
+/**
+ * KEYS.css
+ *
+ * A simple stylesheet for rendering beautiful keyboard-style elements.
+ *
+ * Author:  Michael Hüneburg
+ * Website: http://michaelhue.com/keyscss
+ * License: MIT License (see LICENSE.txt)
+ */
+
+/* Base style, essential for every key. */
+kbd, .key {
+	display: inline;
+	display: inline-block;
+	min-width: 1em;
+	padding: .2em .3em;
+	font: normal .85em/1 "Lucida Grande", Lucida, Arial, sans-serif;
+	text-align: center;
+	text-decoration: none;
+	border-radius: .3em;
+	border: none;
+	cursor: default;
+	user-select: none;
+}
+kbd[title], .key[title] {
+	cursor: help;
+}
+
+/* Dark style for display on light background. This is the default style. */
+kbd, kbd.dark, .dark-keys kbd, .key, .key.dark, .dark-keys .key {
+	background: rgb(80, 80, 80);
+	background: -moz-linear-gradient(top, rgb(60, 60, 60), rgb(80, 80, 80));
+	background: -webkit-gradient(linear, left top, left bottom, from(rgb(60, 60, 60)), to(rgb(80, 80, 80)));
+	color: rgb(250, 250, 250);
+	text-shadow: -1px -1px 0 rgb(70, 70, 70);
+	-moz-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+	-webkit-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+	box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+}
+
+/* Light style for display on dark background. */
+kbd.light, .light-keys kbd, .key.light, .light-keys .key {
+	background: rgb(250, 250, 250);
+	background: -moz-linear-gradient(top, rgb(210, 210, 210), rgb(255, 255, 255));
+	background: -webkit-gradient(linear, left top, left bottom, from(rgb(210, 210, 210)), to(rgb(255, 255, 255)));
+	color:  rgb(50, 50, 50);
+	text-shadow: 0 0 2px rgb(255, 255, 255);
+	-moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	-webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+}
+
+/* Personal styles */
+
+html {
+  font-size: 13px;
+}
+
+#content {
+  width: 96%;
+  margin: auto;
+}
