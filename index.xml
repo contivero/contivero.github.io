@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>My New Hugo Site</title><link>https://contivero.github.io/</link><description>Recent content on My New Hugo Site</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 13 Aug 2022 13:25:02 +0200</lastBuildDate><atom:link href="https://contivero.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>My First Post</title><link>https://contivero.github.io/post/my-first-post/</link><pubDate>Sat, 13 Aug 2022 13:25:02 +0200</pubDate><guid>https://contivero.github.io/post/my-first-post/</guid><description>&lt;p>Some content&lt;/p></description></item><item><title>Tail recursion</title><link>https://contivero.github.io/post/tail-recursion/</link><pubDate>Fri, 12 Aug 2022 13:25:02 +0200</pubDate><guid>https://contivero.github.io/post/tail-recursion/</guid><description>&lt;p>When a function&amp;rsquo;s last action is calling itself, we say it&amp;rsquo;s &lt;em>tail recursive&lt;/em>.&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cristian Ontivero</title><link>https://contivero.github.io/</link><description>Recent content on Cristian Ontivero</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 13 Aug 2022 13:25:02 +0200</lastBuildDate><atom:link href="https://contivero.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Tail recursion</title><link>https://contivero.github.io/post/tail-recursion/</link><pubDate>Sat, 13 Aug 2022 13:25:02 +0200</pubDate><guid>https://contivero.github.io/post/tail-recursion/</guid><description>&lt;p>When a function&amp;rsquo;s last action is calling itself, we say it&amp;rsquo;s &lt;em>tail recursive&lt;/em>.&lt;/p>
 &lt;p>The interest in these functions is that they can be optimized easily by
 compilers, which can replace the recursive implementation by a more performant
 iterative one. A tail-recursive implementation is able to execute an iterative
 process in constant space, even if the process is described by a recursive
 procedure.&lt;/p>
-&lt;p>Guy L. Steele popularized the automatic optimization of tail
-recursions,(although replacing a JSR+RET with JMP was possibly known earlier).&lt;/p>
+&lt;p>Guy L. Steele popularized the automatic optimization of tail recursions
+(although replacing a JSR+RET with JMP was possibly known earlier).&lt;/p>
 &lt;p>If there is a tail-recursive implementation of a function, then special
 iteration constructs (e.g. while and for loops in languages such as C) are
 useful only as syntactic sugar, since the iteration can otherwise be expressed
@@ -142,7 +142,7 @@ is 0.&lt;/p>
 &lt;p>A downside of tail-recursion is that, since the code is compiled into a loop,
 there is no stack trace, which can be counterintuitive when debugging. This is
 why python (purposely) doesn&amp;rsquo;t optimize tail-recursive calls.&lt;/p>
-&lt;p>References:&lt;/p>
+&lt;h2 id="references">References:&lt;/h2>
 &lt;ol>
 &lt;li>History of tail-call optimization (&lt;a href="https://erlang.org/pipermail/erlang-questions/2006-August/022055.html">https://erlang.org/pipermail/erlang-questions/2006-August/022055.html&lt;/a>)&lt;/li>
 &lt;li>Structure and Interpretation of Computer Programs, p.35-36.&lt;/li>
