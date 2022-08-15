@@ -1,0 +1,122 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=author content="Cristian A. Ontivero"><meta name=description content="Methods that use no instance variables should be made static. Making the method static restricts its possibilities, making it easier to reason about. It&rsquo;s more restricted in the sense that it&rsquo;s impossible for it to mutate any instance variable of the class where it&rsquo;s defined. If it&rsquo;s static:
+ You know it doesn&rsquo;t reference any state of the class where it&rsquo;s defined; it can&rsquo;t. It&rsquo;s highly likely it has no side-effect on the object where it&rsquo;s defined."><link rel=icon href=https://contivero.github.io/favicon.ico><meta name=keywords content="hugo  latex  theme"><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css integrity=sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js integrity=sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],ignoredTags:['script','noscript','style','textarea','pre','code','option'],throwOnError:false});});</script><meta property="og:title" content="Thoughts on static methods"><meta property="og:description" content="Methods that use no instance variables should be made static. Making the method static restricts its possibilities, making it easier to reason about. It&rsquo;s more restricted in the sense that it&rsquo;s impossible for it to mutate any instance variable of the class where it&rsquo;s defined. If it&rsquo;s static:
+ You know it doesn&rsquo;t reference any state of the class where it&rsquo;s defined; it can&rsquo;t. It&rsquo;s highly likely it has no side-effect on the object where it&rsquo;s defined."><meta property="og:type" content="article"><meta property="og:url" content="https://contivero.github.io/post/thoughts-on-static-methods/"><meta property="article:published_time" content="2022-08-15T08:00:00+02:00"><meta property="article:modified_time" content="2022-08-15T08:00:00+02:00"><link rel=canonical href=https://contivero.github.io/post/thoughts-on-static-methods/><meta itemprop=name content="Thoughts on static methods"><meta itemprop=description content="Methods that use no instance variables should be made static. Making the method static restricts its possibilities, making it easier to reason about. It&rsquo;s more restricted in the sense that it&rsquo;s impossible for it to mutate any instance variable of the class where it&rsquo;s defined. If it&rsquo;s static:
+ You know it doesn&rsquo;t reference any state of the class where it&rsquo;s defined; it can&rsquo;t. It&rsquo;s highly likely it has no side-effect on the object where it&rsquo;s defined."><meta itemprop=datePublished content="2022-08-15T08:00:00+02:00"><meta itemprop=dateModified content="2022-08-15T08:00:00+02:00"><meta itemprop=wordCount content="952"><meta itemprop=keywords content="Java,"><link media=screen rel=stylesheet href=https://contivero.github.io/css/common.css><link media=screen rel=stylesheet href=https://contivero.github.io/css/content.css><title>Thoughts on static methods - Cristian Ontivero</title><meta name=twitter:card content="summary"><meta name=twitter:title content="Thoughts on static methods"><meta name=twitter:description content="Methods that use no instance variables should be made static. Making the method static restricts its possibilities, making it easier to reason about. It&rsquo;s more restricted in the sense that it&rsquo;s impossible for it to mutate any instance variable of the class where it&rsquo;s defined. If it&rsquo;s static:
+ You know it doesn&rsquo;t reference any state of the class where it&rsquo;s defined; it can&rsquo;t. It&rsquo;s highly likely it has no side-effect on the object where it&rsquo;s defined."><link rel=stylesheet href=https://contivero.github.io/css/single.css></head><body><div id=wrapper><header id=header><h1><a href=https://contivero.github.io/>Cristian Ontivero</a></h1><nav><span class=nav-bar-item><a class=link href=/>Posts</a></span>
+<span class=nav-bar-item><a class=link href=/post/>Archives</a></span>
+<span class=nav-bar-item><a class=link href=/about/>About</a></span></nav></header><main id=main class=post><h1>Thoughts on static methods</h1><div><b>Keywords:</b>
+<a class=link href=https://contivero.github.io/tags/java>#Java</a></div><article class=content><p>Methods that use no instance variables should be made static. Making the
+method static restricts its possibilities, making it easier to reason about.
+It&rsquo;s more restricted in the sense that it&rsquo;s impossible for it to mutate any
+instance variable of the class where it&rsquo;s defined. If it&rsquo;s static:</p><ol><li>You know it doesn&rsquo;t reference any state of the class where it&rsquo;s
+defined; it can&rsquo;t.</li><li>It&rsquo;s highly likely it has no side-effect on the object where it&rsquo;s defined.
+Sure, it could be mutating some static field, but that would most likely be
+terrible design, so one can usually discard that. It&rsquo;s also possible that it
+mutates state of one of its arguments, so the method need not be side-effect
+free. But all that and more is possible with instance methods too.</li></ol><p>All this information is also instantly accessible through the IDE, because it
+uses italics for these methods, so when seeing the italics you know it&rsquo;s some
+utility method with those characteristics.</p><p>It&rsquo;s pointless to require instantiating an object to call a method that makes no
+use of that object&rsquo;s state (with the exception of methods meant to be
+overriden).</p><p>A lot of the time making a method static also reveals others can be static too
+(those calling it), which can end up uncovering a set of methods that makes
+sense to extract into a utility class.</p><h2 id=exposing-temporal-coupling>Exposing temporal coupling</h2><p>Static methods also make explicit any <em>temporal coupling</em>. As a rough example,
+say you have the following:</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>class</span> <span style=color:#00f>SomeClass</span> <span style=color:#666>{</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>final</span> Map<span style=color:#666>&lt;</span>String<span style=color:#666>,</span> String<span style=color:#666>&gt;</span> map <span style=color:#666>=</span> <span style=color:#a2f;font-weight:700>new</span> HashMap<span style=color:#666>&lt;</span><span style=color:#666>&gt;</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+
+    <span style=color:#a2f;font-weight:700>public</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>someMethod</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+	    <span style=color:#080;font-style:italic>/* ... some code ... */</span>
+
+	    computeMapEntries<span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+
+	    <span style=color:#080;font-style:italic>/* ... a bunch of other code ... */</span>
+
+	    doSomethingWithMap<span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+    <span style=color:#666>}</span>
+
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>computeMapEntries</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span> <span style=color:#080;font-style:italic>/* something */</span> <span style=color:#666>}</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>doSomethingWithMap</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span> <span style=color:#080;font-style:italic>/* something */</span> <span style=color:#666>}</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>In such a code, having the map entries computed is a prerequisite for calling
+<code>doSomethingWithMap()</code>, which will use those values. There is thus a temporal
+coupling between both methods, but this is nowhere specified nor enforced. It
+could be that as part of future changes, someone reorders the calls and
+introduces a bug. If, however, <code>doSomethingWithMap()</code> took the map as a
+parameter, then the dependency is made explicit. Assuming no other instance
+field needs to be accessed, then <code>doSomethingWithMap()</code> can be static, which
+would enforce the dependency (the implementation cannot unexpectedly reference
+the map nor any other such field). We might then be able also to avoid defining
+<code>map</code> as an instance variable entirely and instead declare it only inside
+<code>someMethod()</code>.</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>class</span> <span style=color:#00f>SomeClass</span> <span style=color:#666>{</span>
+
+    <span style=color:#a2f;font-weight:700>public</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>someMethod</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+	    <span style=color:#080;font-style:italic>/* ... some code ... */</span>
+
+   	    <span style=color:#a2f;font-weight:700>final</span> Map<span style=color:#666>&lt;</span>String<span style=color:#666>,</span> String<span style=color:#666>&gt;</span> map <span style=color:#666>=</span> computeMapEntries<span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+
+	    <span style=color:#080;font-style:italic>/* ... a bunch of other code ... */</span>
+
+	    doSomethingWithMap<span style=color:#666>(</span>map<span style=color:#666>)</span><span style=color:#666>;</span>
+    <span style=color:#666>}</span>
+
+    <span style=color:#a2f;font-weight:700>private</span> Map<span style=color:#666>&lt;</span>String<span style=color:#666>,</span> String<span style=color:#666>&gt;</span> <span style=color:#00a000>computeMapEntries</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span> <span style=color:#080;font-style:italic>/* something */</span> <span style=color:#666>}</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>doSomethingWithMap</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span> <span style=color:#080;font-style:italic>/* something */</span> <span style=color:#666>}</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>With this, we further reduced the scope of the variable, which helps to avoid
+misuses, e.g. by having the IDE suggest it or auto-complete it in a place where
+it wasn&rsquo;t meant to be used. In particular, having:</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>doSomethingWithMap<span style=color:#666>(</span>map<span style=color:#666>)</span><span style=color:#666>;</span>
+
+<span style=color:#080;font-style:italic>/* ... a bunch of other code ... */</span>
+
+<span style=color:#a2f;font-weight:700>final</span> Map<span style=color:#666>&lt;</span>String<span style=color:#666>,</span> String<span style=color:#666>&gt;</span> map <span style=color:#666>=</span> computeMapEntries<span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+</code></pre></div><p>doesn&rsquo;t compile anymore.</p><h2 id=testability>Testability</h2><p>Detractors of static methods sometimes argue that static methods worsen
+testability as they cannot be overriden, and they are harder to mock (mocking
+frameworks allow mocking static methods, with the downside that those tests
+cannot be parallelized.) Why would one mock, for instance, <code>Math.abs</code>? If the
+method is <a href=https://en.wikipedia.org/wiki/Pure_function>pure</a>, then that&rsquo;s the
+best case for testing: you can call the method with a bunch of inputs and assert
+the outputs. If the static method uses some mutable dependency (for example a
+database, or time such as with <code>LocalDateTime.now()</code>), then I see why you&rsquo;d want
+to mock or somehow change that. But that&rsquo;s because you are doing a bad usage of
+a static method and should rethink your design (for instance, by using a
+<code>java.time.Clock</code> and calling <code>LocalDateTime.now(clock)</code> instead). Also, mocks
+should only be used for
+<a href=https://enterprisecraftsmanship.com/posts/when-to-mock/>shared, unmanaged out-of-process dependencies</a>,
+and since these dependencies tend to be few, most of the time you actually
+shouldn&rsquo;t be mocking.</p><h2 id=instance-vs-static-method>Instance vs. static method</h2><p>All this doesn&rsquo;t mean we should turn all private instance methods into private
+static ones by adding each referenced instance field as an argument to the
+method. After all, we can always change:</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>public</span> <span style=color:#a2f;font-weight:700>class</span> <span style=color:#00f>AnotherClass</span> <span style=color:#666>{</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>int</span> intField<span style=color:#666>;</span>
+    <span style=color:#a2f;font-weight:700>private</span> String stringField<span style=color:#666>;</span>
+    <span style=color:#a2f;font-weight:700>private</span> Service service<span style=color:#666>;</span>
+
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>method</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+        <span style=color:#080;font-style:italic>/* uses intField, stringField and service */</span>
+    <span style=color:#666>}</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>into:</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>public</span> <span style=color:#a2f;font-weight:700>class</span> <span style=color:#00f>AnotherClass</span> <span style=color:#666>{</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>int</span> intField<span style=color:#666>;</span>
+    <span style=color:#a2f;font-weight:700>private</span> String stringField<span style=color:#666>;</span>
+    <span style=color:#a2f;font-weight:700>private</span> Service service<span style=color:#666>;</span>
+
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>static</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>method</span><span style=color:#666>(</span><span style=color:#0b0;font-weight:700>int</span> intField<span style=color:#666>,</span> String stringField<span style=color:#666>,</span> Service service<span style=color:#666>)</span> <span style=color:#666>{</span>
+        <span style=color:#080;font-style:italic>/* uses intField, stringField and service */</span>
+    <span style=color:#666>}</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>and pass the arguments when calling <code>method()</code>.</p><p>When the referenced state is immutable (e.g. it&rsquo;s a final field which
+points to an stateless service initialized on construction), then taking it as
+an argument instead of directly referencing it is pointless and more verbose.</p><p>The same is true if the referenced state is always valid, for example when the
+object is shared and has some feature flag:</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>volatile</span> <span style=color:#0b0;font-weight:700>boolean</span> featureEnabled<span style=color:#666>;</span>
+
+<span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>setFeatureEnabled</span><span style=color:#666>(</span><span style=color:#0b0;font-weight:700>boolean</span> featureEnabled<span style=color:#666>)</span> <span style=color:#666>{</span>
+    <span style=color:#a2f;font-weight:700>this</span><span style=color:#666>.</span><span style=color:#b44>featureEnabled</span> <span style=color:#666>=</span> featureEnabled
+<span style=color:#666>}</span>
+</code></pre></div><p>Then again, it makes sense to use the field directly in an instance method, as
+both boolean states are valid (whether the feature is enabled or not is probably
+something that some other thread defines).</p><p>Another obvious case where we cannot make a method static&mdash;even if no state is
+used&mdash;is when the method is meant to be overriden by subclasses.</p><p>But these cases aside, I tend to make static any method that doesn&rsquo;t depend on
+an object&rsquo;s state. The change can also be suggested, for instance, by Eclipse
+(as a warning) or IntelliJ IDEA (as an inspection).</p></article><div class=paginator><a class=link href=https://contivero.github.io/post/tail-recursion/>← prev</a>
+<a></a></div><div class=comment></div></main><footer id=footer><div><span>© 2019</span> - <span>2022</span></div><div><span>Powered by</span>
+<a class=link href=https://gohugo.io/>Hugo</a>
+<span>🍦 Theme</span>
+<a class=link href=https://github.com/queensferryme/hugo-theme-texify>TeXify</a></div><div class=footnote><span><a class=link href=https://creativecommons.org/licenses/by-nc-sa/4.0 target=_blank rel=noopener>CC BY-NC-SA 4.0</a></span></div></footer></div></body></html>
