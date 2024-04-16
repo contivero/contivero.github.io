@@ -1,4 +1,95 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cristian Ontivero</title><link>https://contivero.github.io/</link><description>Recent content on Cristian Ontivero</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 26 Apr 2023 07:45:13 +0200</lastBuildDate><atom:link href="https://contivero.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Self Proxy Injection Anti-Pattern</title><link>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</link><pubDate>Wed, 26 Apr 2023 07:45:13 +0200</pubDate><guid>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</guid><description>&lt;p>Because of how Spring&amp;rsquo;s implementation of AOP works (i.e. proxies), internal
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cristian Ontivero</title><link>https://contivero.github.io/</link><description>Recent content on Cristian Ontivero</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 16 Apr 2024 21:00:00 +0200</lastBuildDate><atom:link href="https://contivero.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Development Configuration</title><link>https://contivero.github.io/post/development-configuration/</link><pubDate>Tue, 16 Apr 2024 21:00:00 +0200</pubDate><guid>https://contivero.github.io/post/development-configuration/</guid><description>&lt;p>After upgrading my machine at work, I had to migrate my configuration, and even
+remember some forgotten details about it. This is an attempt to document them
+for future reference:&lt;/p>
+&lt;h2 id="git-config">Git config:&lt;/h2>
+&lt;p>Prerequisite: &lt;a href="https://github.com/dandavison/delta">delta&lt;/a>.&lt;/p>
+&lt;pre>&lt;code>[user]
+email = work.email@here
+name = Cristian A. Ontivero
+[diff]
+algorithm = histogram
+[merge]
+conflictstyle = zdiff3
+[pack]
+useSparse = true
+[pull]
+rebase = true
+[pager]
+diff = delta
+log = delta
+reflog = delta
+show = delta
+[interactive]
+diffFilter = delta --color-only
+[delta]
+features = line-numbers decorations
+whitespace-error-style = 22 reverse
+[delta &amp;quot;decorations&amp;quot;]
+commit-decoration-style = bold yellow box ul
+file-style = bold yellow ul
+file-decoration-style = none
+[core]
+bare = false
+compression = 9
+editor = vim -c 'startinsert!'
+filemode = false
+ignorecase = true
+logallrefupdates = true
+repositoryformatversion = 0
+symlinks = false
+pager = less -x1,5
+hooksPath = githooks
+&lt;/code>&lt;/pre>&lt;p>Some explanations:&lt;/p>
+&lt;ol>
+&lt;li>According to a &lt;a href="https://link.springer.com/article/10.1007/s10664-019-09772-z">2019 paper&lt;/a>, the histogram diff algorithm tends to create better patches, leading to less merge conflicts. Of course, it&amp;rsquo;s not the best algorithm for every case, but it is a sensible default.&lt;/li>
+&lt;li>Zealous diff3 (zdiff3) as conflictstyle for merges is quite useful, since it provides more context, and even attempts to solve in part the conflict by extracting out shared snippets of code when it&amp;rsquo;s safe to do so.&lt;/li>
+&lt;li>&lt;code>useSparse = true&lt;/code> under &lt;code>pack&lt;/code> enables an &lt;a href="https://devblogs.microsoft.com/devops/exploring-new-frontiers-for-git-push-performance/">algorithm developed by Microsoft to improve the performance when pushing large repos&lt;/a>. Though having this enabled now is the default.&lt;/li>
+&lt;/ol>
+&lt;h2 id="shell">Shell&lt;/h2>
+&lt;p>I&amp;rsquo;ve gotten used to zsh. For the prompt, I&amp;rsquo;ve been using &lt;a href="https://github.com/olivierverdier/zsh-git-prompt">zsh-git-prompt&lt;/a> for a couple of years already without complaints. It hasn&amp;rsquo;t been maintained for around a decade, but it does it job and does it well.&lt;/p>
+&lt;p>I have a couple of aliases to ease frequent git uses in my .zshrc. The first two make use of &lt;a href="https://github.com/bigH/git-fuzzy">git-fuzzy&lt;/a>:&lt;/p>
+&lt;pre>&lt;code>alias gfs=&amp;quot;git fuzzy status&amp;quot;
+alias gfb=&amp;quot;git fuzzy branch&amp;quot;
+alias go=&amp;quot;git checkout&amp;quot;
+alias gca=&amp;quot;git commit --amend --date=now&amp;quot;
+alias gri=&amp;quot;git rebase -i&amp;quot;
+alias gd=&amp;quot;git diff&amp;quot;
+alias gdc=&amp;quot;git diff --cached&amp;quot;
+alias gom=&amp;quot;git checkout master&amp;quot;
+alias gor=&amp;quot;git checkout release&amp;quot;
+alias gorc=&amp;quot;git checkout release-candidate&amp;quot;
+&lt;/code>&lt;/pre>&lt;p>The last ones of course depend on which branches you deal with frequently in your day-to-day project.&lt;/p>
+&lt;h2 id="eclipse-java-development">Eclipse (Java development):&lt;/h2>
+&lt;ul>
+&lt;li>Full name in javadocs &lt;code>@author&lt;/code> tag: add &lt;code>-Duser.name=DESIRED NAME&lt;/code> in eclipse.ini&lt;/li>
+&lt;li>One can tell Eclipse from where to suggest imports by adding them in Java &amp;gt; Editor &amp;gt; Content Assistant &amp;gt; Favorites. Some useful ones are:
+&lt;ul>
+&lt;li>&lt;code>java.util.Arrays.*&lt;/code> (&lt;code>asList()&lt;/code>)&lt;/li>
+&lt;li>&lt;code>java.util.Collections.*&lt;/code>(&lt;code>emptyList()&lt;/code>, &lt;code>emptyMap()&lt;/code>, &lt;code>singletonList()&lt;/code>, etc.)&lt;/li>
+&lt;li>&lt;code>java.util.stream.Collectors.*&lt;/code> (&lt;code>toSet()&lt;/code>, &lt;code>toList()&lt;/code>, etc.)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Java &amp;gt; Editor &amp;gt; Templates:
+&lt;ul>
+&lt;li>To add a Log4J logger:&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code>${:import(org.apache.logging.log4j.Logger,org.apache.logging.log4j.LogManager)}
+private static final Logger logger = LogManager.getLogger();
+&lt;/code>&lt;/pre>&lt;h2 id="vim">Vim&lt;/h2>
+&lt;p>There is a sea of configurations and plugins available for vim. The bare basics I like having pertain git commit messages. In &lt;code>.vimrc&lt;/code>, enable the filetype plugin:&lt;/p>
+&lt;pre>&lt;code>filetype plugin on
+au FileType gitcommit setlocal tw=72
+&lt;/code>&lt;/pre>&lt;p>Then, inside &lt;code>~/.vim/ftplugin/gitcommit.vim&lt;/code>:&lt;/p>
+&lt;pre>&lt;code>&amp;quot; Enable spell checking to avoid spelling mistakes in commit messages
+set spell spelllang=en_us
+set smartindent
+&amp;quot; Show line at limit of commit message length
+set ruler
+set colorcolumn=+1
+highlight ColorColumn ctermbg=lightgrey guibg=lightgrey
+&lt;/code>&lt;/pre></description></item><item><title>Self Proxy Injection Anti-Pattern</title><link>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</link><pubDate>Wed, 26 Apr 2023 07:45:13 +0200</pubDate><guid>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</guid><description>&lt;p>Because of how Spring&amp;rsquo;s implementation of AOP works (i.e. proxies), internal
 calls to a method in a proxied bean cannot be intercepted. This is a limitation
 of any AOP implementation using dynamic proxies. A way I&amp;rsquo;ve seen used to bypass
 this limitation is having an object with a dependency on itself, so that, for

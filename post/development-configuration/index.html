@@ -1,0 +1,77 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=author content="Cristian A. Ontivero"><meta name=description content="After upgrading my machine at work, I had to migrate my configuration, and even remember some forgotten details about it. This is an attempt to document them for future reference:
+Git config: Prerequisite: delta.
+[user] email = work.email@here name = Cristian A. Ontivero [diff] algorithm = histogram [merge] conflictstyle = zdiff3 [pack] useSparse = true [pull] rebase = true [pager] diff = delta log = delta reflog = delta show = delta [interactive] diffFilter = delta --color-only [delta] features = line-numbers decorations whitespace-error-style = 22 reverse [delta &#34;decorations&#34;] commit-decoration-style = bold yellow box ul file-style = bold yellow ul file-decoration-style = none [core] bare = false compression = 9 editor = vim -c 'startinsert!"><link rel=icon href=https://contivero.github.io/favicon.ico><meta name=keywords content="hugo  latex  theme"><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css integrity=sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js integrity=sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],ignoredTags:['script','noscript','style','textarea','pre','code','option'],throwOnError:false});});</script><meta property="og:title" content="Development Configuration"><meta property="og:description" content="After upgrading my machine at work, I had to migrate my configuration, and even remember some forgotten details about it. This is an attempt to document them for future reference:
+Git config: Prerequisite: delta.
+[user] email = work.email@here name = Cristian A. Ontivero [diff] algorithm = histogram [merge] conflictstyle = zdiff3 [pack] useSparse = true [pull] rebase = true [pager] diff = delta log = delta reflog = delta show = delta [interactive] diffFilter = delta --color-only [delta] features = line-numbers decorations whitespace-error-style = 22 reverse [delta &#34;decorations&#34;] commit-decoration-style = bold yellow box ul file-style = bold yellow ul file-decoration-style = none [core] bare = false compression = 9 editor = vim -c 'startinsert!"><meta property="og:type" content="article"><meta property="og:url" content="https://contivero.github.io/post/development-configuration/"><meta property="article:published_time" content="2024-04-16T21:00:00+02:00"><meta property="article:modified_time" content="2024-04-16T21:00:00+02:00"><link rel=canonical href=https://contivero.github.io/post/development-configuration/><meta itemprop=name content="Development Configuration"><meta itemprop=description content="After upgrading my machine at work, I had to migrate my configuration, and even remember some forgotten details about it. This is an attempt to document them for future reference:
+Git config: Prerequisite: delta.
+[user] email = work.email@here name = Cristian A. Ontivero [diff] algorithm = histogram [merge] conflictstyle = zdiff3 [pack] useSparse = true [pull] rebase = true [pager] diff = delta log = delta reflog = delta show = delta [interactive] diffFilter = delta --color-only [delta] features = line-numbers decorations whitespace-error-style = 22 reverse [delta &#34;decorations&#34;] commit-decoration-style = bold yellow box ul file-style = bold yellow ul file-decoration-style = none [core] bare = false compression = 9 editor = vim -c 'startinsert!"><meta itemprop=datePublished content="2024-04-16T21:00:00+02:00"><meta itemprop=dateModified content="2024-04-16T21:00:00+02:00"><meta itemprop=wordCount content="491"><meta itemprop=keywords content><link media=screen rel=stylesheet href=https://contivero.github.io/css/common.css><link media=screen rel=stylesheet href=https://contivero.github.io/css/content.css><title>Development Configuration - Cristian Ontivero</title><meta name=twitter:card content="summary"><meta name=twitter:title content="Development Configuration"><meta name=twitter:description content="After upgrading my machine at work, I had to migrate my configuration, and even remember some forgotten details about it. This is an attempt to document them for future reference:
+Git config: Prerequisite: delta.
+[user] email = work.email@here name = Cristian A. Ontivero [diff] algorithm = histogram [merge] conflictstyle = zdiff3 [pack] useSparse = true [pull] rebase = true [pager] diff = delta log = delta reflog = delta show = delta [interactive] diffFilter = delta --color-only [delta] features = line-numbers decorations whitespace-error-style = 22 reverse [delta &#34;decorations&#34;] commit-decoration-style = bold yellow box ul file-style = bold yellow ul file-decoration-style = none [core] bare = false compression = 9 editor = vim -c 'startinsert!"><link rel=stylesheet href=https://contivero.github.io/css/single.css></head><body><div id=wrapper><header id=header><h1><a href=https://contivero.github.io/>Cristian Ontivero</a></h1><nav><span class=nav-bar-item><a class=link href=/>Posts</a></span>
+<span class=nav-bar-item><a class=link href=/post/>Archives</a></span>
+<span class=nav-bar-item><a class=link href=/about/>About</a></span></nav></header><main id=main class=post><h1>Development Configuration</h1><article class=content><p>After upgrading my machine at work, I had to migrate my configuration, and even
+remember some forgotten details about it. This is an attempt to document them
+for future reference:</p><h2 id=git-config>Git config:</h2><p>Prerequisite: <a href=https://github.com/dandavison/delta>delta</a>.</p><pre><code>[user]
+    email = work.email@here
+    name = Cristian A. Ontivero
+[diff]
+    algorithm = histogram
+[merge]
+    conflictstyle = zdiff3
+[pack]
+    useSparse = true
+[pull]
+    rebase = true
+[pager]
+    diff = delta
+    log = delta
+    reflog = delta
+    show = delta
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    features = line-numbers decorations
+    whitespace-error-style = 22 reverse
+[delta &quot;decorations&quot;]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
+[core]
+    bare = false
+    compression = 9
+    editor = vim -c 'startinsert!'
+    filemode = false
+    ignorecase = true
+    logallrefupdates = true
+    repositoryformatversion = 0
+    symlinks = false
+    pager = less -x1,5
+    hooksPath = githooks
+</code></pre><p>Some explanations:</p><ol><li>According to a <a href=https://link.springer.com/article/10.1007/s10664-019-09772-z>2019 paper</a>, the histogram diff algorithm tends to create better patches, leading to less merge conflicts. Of course, it&rsquo;s not the best algorithm for every case, but it is a sensible default.</li><li>Zealous diff3 (zdiff3) as conflictstyle for merges is quite useful, since it provides more context, and even attempts to solve in part the conflict by extracting out shared snippets of code when it&rsquo;s safe to do so.</li><li><code>useSparse = true</code> under <code>pack</code> enables an <a href=https://devblogs.microsoft.com/devops/exploring-new-frontiers-for-git-push-performance/>algorithm developed by Microsoft to improve the performance when pushing large repos</a>. Though having this enabled now is the default.</li></ol><h2 id=shell>Shell</h2><p>I&rsquo;ve gotten used to zsh. For the prompt, I&rsquo;ve been using <a href=https://github.com/olivierverdier/zsh-git-prompt>zsh-git-prompt</a> for a couple of years already without complaints. It hasn&rsquo;t been maintained for around a decade, but it does it job and does it well.</p><p>I have a couple of aliases to ease frequent git uses in my .zshrc. The first two make use of <a href=https://github.com/bigH/git-fuzzy>git-fuzzy</a>:</p><pre><code>alias gfs=&quot;git fuzzy status&quot;
+alias gfb=&quot;git fuzzy branch&quot;
+alias go=&quot;git checkout&quot;
+alias gca=&quot;git commit --amend --date=now&quot;
+alias gri=&quot;git rebase -i&quot;
+alias gd=&quot;git diff&quot;
+alias gdc=&quot;git diff --cached&quot;
+
+alias gom=&quot;git checkout master&quot;
+alias gor=&quot;git checkout release&quot;
+alias gorc=&quot;git checkout release-candidate&quot;
+</code></pre><p>The last ones of course depend on which branches you deal with frequently in your day-to-day project.</p><h2 id=eclipse-java-development>Eclipse (Java development):</h2><ul><li>Full name in javadocs <code>@author</code> tag: add <code>-Duser.name=DESIRED NAME</code> in eclipse.ini</li><li>One can tell Eclipse from where to suggest imports by adding them in Java > Editor > Content Assistant > Favorites. Some useful ones are:<ul><li><code>java.util.Arrays.*</code> (<code>asList()</code>)</li><li><code>java.util.Collections.*</code>(<code>emptyList()</code>, <code>emptyMap()</code>, <code>singletonList()</code>, etc.)</li><li><code>java.util.stream.Collectors.*</code> (<code>toSet()</code>, <code>toList()</code>, etc.)</li></ul></li><li>Java > Editor > Templates:<ul><li>To add a Log4J logger:</li></ul></li></ul><pre><code>${:import(org.apache.logging.log4j.Logger,org.apache.logging.log4j.LogManager)}
+private static final Logger logger = LogManager.getLogger();
+</code></pre><h2 id=vim>Vim</h2><p>There is a sea of configurations and plugins available for vim. The bare basics I like having pertain git commit messages. In <code>.vimrc</code>, enable the filetype plugin:</p><pre><code>filetype plugin on
+au FileType gitcommit setlocal tw=72
+</code></pre><p>Then, inside <code>~/.vim/ftplugin/gitcommit.vim</code>:</p><pre><code>&quot; Enable spell checking to avoid spelling mistakes in commit messages
+set spell spelllang=en_us
+
+set smartindent
+
+&quot; Show line at limit of commit message length
+set ruler
+set colorcolumn=+1
+highlight ColorColumn ctermbg=lightgrey guibg=lightgrey
+</code></pre></article><div class=paginator><a class=link href=https://contivero.github.io/post/self-proxy-injection-anti-pattern/>← prev</a>
+<a></a></div><div class=comment></div></main><footer id=footer><div><span>© 2019</span> - <span>2024</span></div><div><span>Powered by</span>
+<a class=link href=https://gohugo.io/>Hugo</a>
+<span>🍦 Theme</span>
+<a class=link href=https://github.com/queensferryme/hugo-theme-texify>TeXify</a></div><div class=footnote><span><a class=link href=https://creativecommons.org/licenses/by-nc-sa/4.0 target=_blank rel=noopener>CC BY-NC-SA 4.0</a></span></div></footer></div></body></html>
