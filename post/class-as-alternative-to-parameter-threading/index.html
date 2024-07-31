@@ -1,0 +1,129 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=author content="Cristian A. Ontivero"><meta name=description content="Instead of injecting values through method arguments and having to keep passing them wherever they are needed, consider creating an immutable object which encapsulates the logic and the needed values which are set on creation.
+One benefit of this is improved readability. For instance, suppose we have two sets, one of valid codes for something (validCodes) and another of allowed dates (allowedDates). Compare:
+if (isValidCode(validCodes, code) && isInAllowedDates(allowedDates, date)) { /* do something */ } vs."><link rel=icon href=https://contivero.github.io/favicon.ico><meta name=keywords content="hugo  latex  theme"><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css integrity=sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js integrity=sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],ignoredTags:['script','noscript','style','textarea','pre','code','option'],throwOnError:false});});</script><meta property="og:title" content="Class as Alternative to Parameter Threading"><meta property="og:description" content="Instead of injecting values through method arguments and having to keep passing them wherever they are needed, consider creating an immutable object which encapsulates the logic and the needed values which are set on creation.
+One benefit of this is improved readability. For instance, suppose we have two sets, one of valid codes for something (validCodes) and another of allowed dates (allowedDates). Compare:
+if (isValidCode(validCodes, code) && isInAllowedDates(allowedDates, date)) { /* do something */ } vs."><meta property="og:type" content="article"><meta property="og:url" content="https://contivero.github.io/post/class-as-alternative-to-parameter-threading/"><meta property="article:published_time" content="2024-07-31T00:00:00+02:00"><meta property="article:modified_time" content="2024-07-31T00:00:00+02:00"><link rel=canonical href=https://contivero.github.io/post/class-as-alternative-to-parameter-threading/><meta itemprop=name content="Class as Alternative to Parameter Threading"><meta itemprop=description content="Instead of injecting values through method arguments and having to keep passing them wherever they are needed, consider creating an immutable object which encapsulates the logic and the needed values which are set on creation.
+One benefit of this is improved readability. For instance, suppose we have two sets, one of valid codes for something (validCodes) and another of allowed dates (allowedDates). Compare:
+if (isValidCode(validCodes, code) && isInAllowedDates(allowedDates, date)) { /* do something */ } vs."><meta itemprop=datePublished content="2024-07-31T00:00:00+02:00"><meta itemprop=dateModified content="2024-07-31T00:00:00+02:00"><meta itemprop=wordCount content="808"><meta itemprop=keywords content="Java,"><link media=screen rel=stylesheet href=https://contivero.github.io/css/common.css><link media=screen rel=stylesheet href=https://contivero.github.io/css/content.css><title>Class as Alternative to Parameter Threading - Cristian Ontivero</title><meta name=twitter:card content="summary"><meta name=twitter:title content="Class as Alternative to Parameter Threading"><meta name=twitter:description content="Instead of injecting values through method arguments and having to keep passing them wherever they are needed, consider creating an immutable object which encapsulates the logic and the needed values which are set on creation.
+One benefit of this is improved readability. For instance, suppose we have two sets, one of valid codes for something (validCodes) and another of allowed dates (allowedDates). Compare:
+if (isValidCode(validCodes, code) && isInAllowedDates(allowedDates, date)) { /* do something */ } vs."><link rel=stylesheet href=https://contivero.github.io/css/single.css></head><body><div id=wrapper><header id=header><h1><a href=https://contivero.github.io/>Cristian Ontivero</a></h1><nav><span class=nav-bar-item><a class=link href=/>Posts</a></span>
+<span class=nav-bar-item><a class=link href=/post/>Archives</a></span>
+<span class=nav-bar-item><a class=link href=/about/>About</a></span></nav></header><main id=main class=post><h1>Class as Alternative to Parameter Threading</h1><div><b>Keywords:</b>
+<a class=link href=https://contivero.github.io/tags/java>#Java</a></div><article class=content><p>Instead of injecting values through method arguments and having to keep passing
+them wherever they are needed, consider creating an immutable object which
+encapsulates the logic and the needed values which are set on creation.</p><p>One benefit of this is improved readability. For instance, suppose we
+have two sets, one of valid codes for something (<code>validCodes</code>) and another of
+allowed dates (<code>allowedDates</code>). Compare:</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>if</span> <span style=color:#666>(</span>isValidCode<span style=color:#666>(</span>validCodes<span style=color:#666>,</span> code<span style=color:#666>)</span>
+  <span style=color:#666>&amp;</span><span style=color:#666>&amp;</span> isInAllowedDates<span style=color:#666>(</span>allowedDates<span style=color:#666>,</span> date<span style=color:#666>)</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+	<span style=color:#080;font-style:italic>/* do something */</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>vs.</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>if</span> <span style=color:#666>(</span>isValidCode<span style=color:#666>(</span>code<span style=color:#666>)</span> <span style=color:#666>&amp;</span><span style=color:#666>&amp;</span> isInAllowedDate<span style=color:#666>(</span>date<span style=color:#666>)</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+	<span style=color:#080;font-style:italic>/* do something */</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>This can be useful when a method starts by getting a bunch of values which don&rsquo;t
+change (say, getting a bunch of user IDs from the database for some kind of
+processing). Storing these on the enclosing class means setting them in a
+mutable (non-final) field, because these will be initialized in a method and not
+in the constructor. As a trimmed-down example, consider the following code which
+sends a coupon code:</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>public</span> <span style=color:#a2f;font-weight:700>class</span> <span style=color:#00f>CouponCodeEmailSendingJob</span> <span style=color:#a2f;font-weight:700>implements</span> Runnable <span style=color:#666>{</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>final</span> UserService userService<span style=color:#666>;</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>final</span> MailService mailService<span style=color:#666>;</span>
+
+    <span style=color:#a2f;font-weight:700>private</span> Set<span style=color:#666>&lt;</span>User<span style=color:#666>&gt;</span> users<span style=color:#666>;</span>
+    <span style=color:#a2f;font-weight:700>private</span> String emailTemplate<span style=color:#666>;</span>
+
+    <span style=color:#a2f;font-weight:700>public</span> <span style=color:#00a000>CouponCodeEmailSendingJob</span><span style=color:#666>(</span>UserService userService<span style=color:#666>,</span> MailService mailService<span style=color:#666>)</span> <span style=color:#666>{</span>
+        <span style=color:#a2f;font-weight:700>this</span><span style=color:#666>.</span><span style=color:#b44>userService</span> <span style=color:#666>=</span> userService<span style=color:#666>;</span>
+        <span style=color:#a2f;font-weight:700>this</span><span style=color:#666>.</span><span style=color:#b44>mailService</span> <span style=color:#666>=</span> mailService<span style=color:#666>;</span>
+    <span style=color:#666>}</span>
+
+    <span style=color:#a2f;font-weight:700>public</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>run</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+        users <span style=color:#666>=</span> userService<span style=color:#666>.</span><span style=color:#b44>getUsers</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+        emailTemplate <span style=color:#666>=</span> mailService<span style=color:#666>.</span><span style=color:#b44>getCurrentEmailTemplate</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+        <span style=color:#080;font-style:italic>/* more code */</span>
+        sendEmails<span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+        <span style=color:#080;font-style:italic>/* mode code */</span>
+    <span style=color:#666>}</span>
+
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>sendEmails</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+        <span style=color:#a2f;font-weight:700>for</span> <span style=color:#666>(</span>User user <span style=color:#666>:</span> users<span style=color:#666>)</span> <span style=color:#666>{</span>
+          mailService<span style=color:#666>.</span><span style=color:#b44>sendCouponCodeEmail</span><span style=color:#666>(</span>user<span style=color:#666>,</span> emailTemplate<span style=color:#666>)</span><span style=color:#666>;</span>
+        <span style=color:#666>}</span>
+    <span style=color:#666>}</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>For starters, the temporal dependency between assigning fields and using them
+isn&rsquo;t explicit. In such small example it might be obvious, but the less I need
+to think and keep track off in my mind, the better. If we were dealing with a
+more complex case as it usually is, we might end up re-ordering statements so
+that we attempt to send emails before the users and emailTemplate fields are
+set. Presumably such glarious mistake would pop-up during testing, but it still
+would make us lose time.</p><p>We can make the dependency explicit by taking both as parameters for
+<code>sendEmails</code>, and making the variables local to the method and not fields.</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>  <span style=color:#a2f;font-weight:700>final</span> Set<span style=color:#666>&lt;</span>User<span style=color:#666>&gt;</span> users <span style=color:#666>=</span> userService<span style=color:#666>.</span><span style=color:#b44>getUsers</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+  <span style=color:#a2f;font-weight:700>final</span> String emailTemplate <span style=color:#666>=</span> mailService<span style=color:#666>.</span><span style=color:#b44>getCurrentEmailTemplate</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+  <span style=color:#080;font-style:italic>/* more code */</span>
+  sendEmails<span style=color:#666>(</span>users<span style=color:#666>,</span> emailTemplate<span style=color:#666>)</span><span style=color:#666>;</span>
+  <span style=color:#080;font-style:italic>/* mode code */</span>
+</code></pre></div><p>Now, if we reorder the code in an incorrect manner, it won&rsquo;t compile. This is an
+improvement. But sometimes it&rsquo;s not two parameters, but five, or more. And it&rsquo;s
+not a single private method, but several, and we need to keep threading the
+parameters down to wherever they are needed. This can get unwidly fast.</p><p>Thread-safety is another issue with the original code that we&rsquo;ve improved upon.
+In the first iteration of the code, by having <code>users</code> and <code>emailTemplate</code> be
+non-final instance variables, if the <code>Runnable</code> would be called in parallel,
+then we might change the <code>users</code> and <code>emailTemplate</code> fields before the first
+thread attempts to send the emails (e.g. if the &ldquo;current&rdquo; email template is
+another by the time the second thread runs). Because of that, making them
+variables local to the method&rsquo;s scope is safer.</p><p>But still the annoyance with threading parameters remains. In such cases,
+defining them as fields in a new class allows us to avoid this, and potentially
+move towards immutability, which would aid with making the code easier to
+understand, and closer to being thread-safe.</p><div class=highlight><pre style=background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#a2f;font-weight:700>public</span> <span style=color:#a2f;font-weight:700>class</span> <span style=color:#00f>CouponCodeEmailSendingJob</span> <span style=color:#a2f;font-weight:700>implements</span> Runnable <span style=color:#666>{</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>final</span> UserService userService<span style=color:#666>;</span>
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>final</span> MailService mailService<span style=color:#666>;</span>
+
+    <span style=color:#a2f;font-weight:700>public</span> <span style=color:#00a000>CouponCodeEmailSendingJob</span><span style=color:#666>(</span>UserService userService<span style=color:#666>,</span> MailService mailService<span style=color:#666>)</span> <span style=color:#666>{</span>
+        <span style=color:#a2f;font-weight:700>this</span><span style=color:#666>.</span><span style=color:#b44>userService</span> <span style=color:#666>=</span> userService<span style=color:#666>;</span>
+        <span style=color:#a2f;font-weight:700>this</span><span style=color:#666>.</span><span style=color:#b44>mailService</span> <span style=color:#666>=</span> mailService<span style=color:#666>;</span>
+    <span style=color:#666>}</span>
+
+    <span style=color:#a2f;font-weight:700>public</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>run</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+        <span style=color:#a2f;font-weight:700>new</span> InnerJob<span style=color:#666>(</span>userService<span style=color:#666>.</span><span style=color:#b44>getPremiumUsers</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>,</span> mailService<span style=color:#666>.</span><span style=color:#b44>getCurrentEmailTemplate</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>)</span>
+            <span style=color:#666>.</span><span style=color:#b44>run</span><span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+    <span style=color:#666>}</span>
+
+    <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>class</span> <span style=color:#00f>InnerJob</span> <span style=color:#a2f;font-weight:700>implements</span> Runnable <span style=color:#666>{</span>
+        <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>final</span> Set<span style=color:#666>&lt;</span>User<span style=color:#666>&gt;</span> users<span style=color:#666>;</span>
+        <span style=color:#a2f;font-weight:700>private</span> <span style=color:#a2f;font-weight:700>final</span> String emailTemplate<span style=color:#666>;</span>
+
+        <span style=color:#a2f;font-weight:700>private</span> <span style=color:#00a000>InnerJob</span><span style=color:#666>(</span>Set<span style=color:#666>&lt;</span>User<span style=color:#666>&gt;</span> users<span style=color:#666>,</span> emailTemplate<span style=color:#666>)</span> <span style=color:#666>{</span>
+            <span style=color:#a2f;font-weight:700>this</span><span style=color:#666>.</span><span style=color:#b44>users</span> <span style=color:#666>=</span> users<span style=color:#666>;</span>
+            <span style=color:#a2f;font-weight:700>this</span><span style=color:#666>.</span><span style=color:#b44>emailTemplate</span> <span style=color:#666>=</span> emailTemplate<span style=color:#666>;</span>
+        <span style=color:#666>}</span>
+
+        <span style=color:#a2f;font-weight:700>public</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>run</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+            <span style=color:#080;font-style:italic>/* more code ... */</span>
+            sendEmails<span style=color:#666>(</span><span style=color:#666>)</span><span style=color:#666>;</span>
+            <span style=color:#080;font-style:italic>/* more code ... */</span>
+        <span style=color:#666>}</span>
+
+        <span style=color:#a2f;font-weight:700>private</span> <span style=color:#0b0;font-weight:700>void</span> <span style=color:#00a000>sendEmail</span><span style=color:#666>(</span><span style=color:#666>)</span> <span style=color:#666>{</span>
+            <span style=color:#666>/</span> <span style=color:#666>*</span> <span style=color:#666>.</span><span style=color:#666>.</span><span style=color:#666>.</span> <span style=color:#666>*</span> <span style=color:#666>/</span>
+        <span style=color:#666>}</span>
+        <span style=color:#080;font-style:italic>/* ... */</span>
+    <span style=color:#666>}</span>
+<span style=color:#666>}</span>
+</code></pre></div><p>Now if we ever need to run this in parallel, each run has its own instance of
+<code>InnerJob</code>, so we don&rsquo;t need to worry about race conditions. <code>InnerJob</code> could
+even have mutable state (say, keep track of statistics for logging how many
+emails were sent, how many failed, etc.), and it wouldn&rsquo;t be an issue because
+<code>InnerJob</code> is never shared between threads.</p><p>Of course we can still create implicit temporal couplings because the set of
+users is shallowly immutable. A method could filter out some users from the set,
+or add new ones, and then depending on when <code>sendEmails()</code> is called, we would
+send it to a set of users or another. Ideally though, we should treat the Set as
+immutable and not modify it once it&rsquo;s set. Any such filtering or additions
+would be best performed before initializing <code>InnerJob</code> with the <code>Set</code> to use. If
+so desired, we could enforce this by using some immutable set implementation
+(e.g. by wrapping the <code>Set</code> in <code>Collections.unmodifiableSet</code>), but for small,
+contained pieces of code, this is usually not needed.</p></article><div class=paginator><a class=link href=https://contivero.github.io/post/development-configuration/>← prev</a>
+<a></a></div><div class=comment></div></main><footer id=footer><div><span>© 2019</span> - <span>2024</span></div><div><span>Powered by</span>
+<a class=link href=https://gohugo.io/>Hugo</a>
+<span>🍦 Theme</span>
+<a class=link href=https://github.com/queensferryme/hugo-theme-texify>TeXify</a></div><div class=footnote><span><a class=link href=https://creativecommons.org/licenses/by-nc-sa/4.0 target=_blank rel=noopener>CC BY-NC-SA 4.0</a></span></div></footer></div></body></html>
