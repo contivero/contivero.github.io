@@ -1,0 +1,159 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=author content="Cristian A. Ontivero"><meta name=description content="While working on a legacy codebase, I had the chance to track down several random test failures: tests that worked or not depending on the time of the day, or depending on the order the test classes were running, etc.
+Following are some such stories.
+Test working in the IDE but failing with maven A test was failing as part of the Jenkins pipeline, but working fine locally from my IDE."><link rel=icon href=https://contivero.github.io/favicon.ico><meta name=keywords content="hugo  latex  theme"><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css integrity=sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js integrity=sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],ignoredTags:['script','noscript','style','textarea','pre','code','option'],throwOnError:false});});</script><meta property="og:title" content="Stories About Flaky Tests"><meta property="og:description" content="While working on a legacy codebase, I had the chance to track down several random test failures: tests that worked or not depending on the time of the day, or depending on the order the test classes were running, etc.
+Following are some such stories.
+Test working in the IDE but failing with maven A test was failing as part of the Jenkins pipeline, but working fine locally from my IDE."><meta property="og:type" content="article"><meta property="og:url" content="https://contivero.github.io/post/stories_about_flaky_tests/"><meta property="article:published_time" content="2024-08-02T00:00:00-02:00"><meta property="article:modified_time" content="2024-08-02T00:00:00-02:00"><link rel=canonical href=https://contivero.github.io/post/stories_about_flaky_tests/><meta itemprop=name content="Stories About Flaky Tests"><meta itemprop=description content="While working on a legacy codebase, I had the chance to track down several random test failures: tests that worked or not depending on the time of the day, or depending on the order the test classes were running, etc.
+Following are some such stories.
+Test working in the IDE but failing with maven A test was failing as part of the Jenkins pipeline, but working fine locally from my IDE."><meta itemprop=datePublished content="2024-08-02T00:00:00-02:00"><meta itemprop=dateModified content="2024-08-02T00:00:00-02:00"><meta itemprop=wordCount content="2052"><meta itemprop=keywords content="Java,Tests,"><link media=screen rel=stylesheet href=https://contivero.github.io/css/common.css><link media=screen rel=stylesheet href=https://contivero.github.io/css/content.css><title>Stories About Flaky Tests - Cristian Ontivero</title><meta name=twitter:card content="summary"><meta name=twitter:title content="Stories About Flaky Tests"><meta name=twitter:description content="While working on a legacy codebase, I had the chance to track down several random test failures: tests that worked or not depending on the time of the day, or depending on the order the test classes were running, etc.
+Following are some such stories.
+Test working in the IDE but failing with maven A test was failing as part of the Jenkins pipeline, but working fine locally from my IDE."><link rel=stylesheet href=https://contivero.github.io/css/single.css></head><body><div id=wrapper><header id=header><h1><a href=https://contivero.github.io/>Cristian Ontivero</a></h1><nav><span class=nav-bar-item><a class=link href=/>Posts</a></span>
+<span class=nav-bar-item><a class=link href=/post/>Archives</a></span>
+<span class=nav-bar-item><a class=link href=/about/>About</a></span></nav></header><main id=main class=post><h1>Stories About Flaky Tests</h1><div><b>Keywords:</b>
+<a class=link href=https://contivero.github.io/tags/java>#Java</a>
+<a class=link href=https://contivero.github.io/tags/tests>#Tests</a></div><article class=content><p>While working on a legacy codebase, I had the chance to track down several
+random test failures: tests that worked or not depending on the time of the day,
+or depending on the order the test classes were running, etc.</p><p>Following are some such stories.</p><h2 id=test-working-in-the-ide-but-failing-with-maven>Test working in the IDE but failing with maven</h2><p>A test was failing as part of the Jenkins pipeline, but working fine locally
+from my IDE. Even reproducing the execution order of the tests as a test suite
+wouldn&rsquo;t trigger the problem. Running the tests with maven though did cause it
+to fail.</p><p>Unfortunately the assertion&rsquo;s error message wasn&rsquo;t good, but improving it was
+enough to pinpoint the issue. After switching the assertion to use AssertJ,
+the error was something as follows:</p><blockquote><p>Expecting map:
+{&ldquo;$jacocoData"=[true, false, true, false, true, false, true], &ldquo;field1"="value1&rdquo;, &ldquo;field2"=123, &ldquo;field3"=true}
+to contain only:
+[&ldquo;field1"="value1&rdquo;, &ldquo;field3"=true, &ldquo;field2"=123]
+but the following map entries were unexpected:
+[&ldquo;$jacocoData"=[true, false, true, false, true, false, true]]</p></blockquote><p>We had recently added Jacoco to our build for code coverage. The problem was
+that we were using reflection to get the declared fields of a class, and when
+running the tests with Jacoco for code coverage, Jacoco adds a synthetic field
+to the class named $jacocoData, which was making the assertion fail. The
+solution was simply ignoring synthetic fields, which is in any case good
+practice.</p><h2 id=tests-failing-depending-on-execution-speed>Tests failing depending on execution speed</h2><p>Some tests were asserting that the time stored in an entity was strictly before
+the time when the assertion ran. When the test was fast enough, the time when
+the entity was created and the time when the assertion ran didn&rsquo;t differ,
+causing the test to fail. Debugging it would cause it to pass, as running it
+with a debugger caused enough of a slowdown that the times always differed.</p><p>This issue is trivially noticed and fixed with the right assertion messages.
+If doing, e.g.:</p><pre><code>assertTrue(LocalDateTime.now().isAfter(entity.getCreationDateTime()));
+</code></pre><p>having the assertion fail doesn&rsquo;t give us a meaningful message. Using AssertJ
+with the right methods provides a lot more information. Fixing the assertion
+to consider equality:</p><pre><code>assertThat(entity.getCreationDateTime())
+    .as(&quot;creationDateTime&quot;)
+    .isBeforeOrEqualTo(now);
+</code></pre><h2 id=tests-failing-due-to-ehcaches-singleton-cachemanager>Tests failing due to EhCache&rsquo;s singleton CacheManager</h2><p>For a long time we sometimes had a cascade of failing tests saying that a Cache
+had been shut down. We noticed that it seemed to be that after some test failed,
+something was left in an invalid state and affected subsequent tests. In the
+end, what was happening was that the code was using EhCache as a singleton, and
+when there was an issue initializing an ApplicationContext, Spring was calling
+<code>destroy()</code> on the <code>CacheManager</code>. This <code>CacheManager</code>, being a singleton for
+the whole JVM, was reused by any other tests needing it, but had already been
+shutdown previously. The final fix was changing the code to use separate
+<code>CacheManager</code> instances per application context.</p><p>Somewhat related, there was a test calling</p><pre><code>CacheManager cacheManger = CacheManager.create();
+cacheManger.removeAllCaches();
+</code></pre><p><code>CacheManager.create()</code> reuses the singleton <code>CacheManager</code> if there is one
+(otherwise it creates it), so it was effectively removing all caches for
+subsequent tests, also causing issues.</p><h2 id=tests-failing-depending-on-the-date-or-time-of-execution>Tests failing depending on the date or time of execution</h2><p>Dates and time are full of complexity and provide a myriad of pitfalls. The
+options usually are two:</p><ol><li>Either making it so that the test can always use the current time and work anyway, or</li><li>Use a fixed time by having a <code>java.time.Clock</code> injected wherever time is
+needed, and using a fixed <code>Clock</code> for the test.</li></ol><h3 id=test-failing-the-29th-of-february>Test failing the 29th of February</h3><p>We had a test for a method that given a birthday date, would return when the
+birthday should be on the current year. The test was using the current time and
+shifting it a year in the past to construct a date, something as follows:</p><pre><code>final Date lastYear = DateUtils.addYears(now, -1);
+assertEquals(now, DateTools.getBirthdayDate(lastYear));
+</code></pre><p>When running on the 29th of February, the previous year had no 29th of February
+(since it&rsquo;s not a leap year); the assertion would then fail because it expected
+the birthday date to be today, 29th, but was the 28th.</p><h3 id=test-failing-near-midnight>Test failing near midnight</h3><p>Part of the code was using java&rsquo;s legacy <code>Date</code> class, and to better support
+caching, it was rounding the <code>Date</code> to the next hour. The idea was that calling
+a service method with today at 16:03:00, or at 16:03:01, or at 16:59, would all
+hit the same cache entry, instead of each one creating new cache entries but
+always missing them.</p><p>The test was assigning permissions to a user for some action starting tomorrow,
+and at some point asserting that the user did <em>not</em> have permissions for that
+action <em>now</em> (today). However, the code checking these permissions was using
+this rounding logic, so that asking between 23:00 and midnight would return
+<code>true</code> (i.e. that the persons did in fact have permissions today at the time of
+running), because when rounding to the next hour, it would end up asking about
+permissions on the following day.</p><h3 id=test-failing-only-between-0000-and-0200>Test failing only between 00:00 and 02:00</h3><p>Some tests had been sporadically failing for years without anyone knowing why.
+Behind not understanding hides a teaching, so I spent some time to figure it
+out. I noticed the failures only happened between 00:00 and 02:00, and could
+reproduce this locally by changing the system&rsquo;s clock to a time inside that
+range. Having a reproduction, the rest was a matter of time.</p><p>I&rsquo;ll focus on one test, as the others were variations of the same issue.
+The test started with creating an entity and asserting that it could be found.
+This failed between 00:00 and 02:00.</p><p>The problem was that the entity had a validity (two <code>Date</code> properties specifying
+from when until when that entity was valid), and the service method being used
+to find the entity was taking validity into account.</p><p>When creating the entity, it would have as <code>validFrom</code> the date when the test
+was running at start of the day, say <code>2021-09-19 00:00:00.0</code>. For the HQL query,
+the problematic part of the where clause was:</p><pre><code>    validFrom &lt;= current_timestamp()
+</code></pre><p>at first sight, this looks fine. What&rsquo;s the problem? The test was using HSQLDB,
+and Hibernate translates <code>current_timestamp()</code> to HSQLDB&rsquo;s <code>current_timestamp</code>,
+which includes a time zone. Running the test in Vienna with time zone UTC+2
+meant the condition would look something as follows:</p><pre><code>    2021-09-19 00:00:00.0 &lt;= 2021-09-19 00:13:39.611+02
+</code></pre><p>HSQLDB would then take the time zone into account, and use UTC for the
+<code>validFrom</code> date. Shifting to UTC, the condition would look like:</p><pre><code>    2021-09-19 00:00:00.0 &lt;= 2021-09-18 22:13:39.611
+</code></pre><p>which makes the issue more obvious. The condition was thus true between 02:00
+and midnight, making the test normally pass, and false between 00:00 and 02:00,
+making it fail during that time.</p><p>The solution was using <code>current_date()</code> which returns a value of type DATE, i.e.
+does not include time zone, but read the next one about <code>current_date()</code>!</p><h2 id=hql-query-parameter-vs-current_date>HQL Query Parameter vs. <code>current_date()</code></h2><p>After some code changes a test started failing. The test was creating an entity
+with a validity: two <code>Date</code> properties called <code>validFrom</code> and <code>validTo</code>, where
+the first one was &ldquo;now&rdquo;, and the second one &ldquo;infinity&rdquo; (some big sentinel value
+for the date). At some point we were querying for this entity, and the result
+set was coming empty. Eventually I narrowed down the problem to a change in the
+HQL query. I had replaced a <code>Date</code> parameter by <code>current_date()</code>, i.e. the
+query used to be something like:</p><pre><code>session.createQuery(
+    &quot;select ... from ... &quot;
+    + &quot;where :date between validFrom and validTo&quot;)
+.setParameter(&quot;date&quot;, new Date())
+.list();
+</code></pre><p>and I replaced the where condition by <code>current_date() between validFrom and validTo</code>.</p><p>After some time, I found out that the time reported by the dockerized SQL
+Server DB (using testcontainers) was an hour in the past. This was because by
+default the docker container was using UTC as timezone, but I was running the
+test in Vienna, which had UTC+1 at the time. I fixed this, so that the timezone
+of the container matched the one used by the JVM (using the <code>TZ</code> environment
+variable).</p><p>I thought I was done, but then the test started randomly failing. When
+debugging the test though, it always passed (a so-called &ldquo;Heisenbug&rdquo;).</p><p>Eventually, I noticed that the time reported by SQL Server was some milliseconds
+behind the time reported by Java. Hibernate translates <code>current_date()</code> to SQL
+Server&rsquo;s <code>GetDate()</code>, which includes the time apart from the date. Thus, when
+the test executed fast enough, sometimes the date-time returned by using
+<code>current_date()</code> was slightly in the past compared to the time as seen in Java,
+making the query fail (because the <code>validFrom</code> of the created entity was some
+milliseconds <em>after</em> the <code>current_date()</code> time when executing the query). By then
+I had spent enough figuring out the issue, that I couldn&rsquo;t spend more figuring
+out why the millisecond mismatch. I simply changed the query to use a parameter,
+in that way the time was sure to be right.</p><h2 id=modifying-in-memory-state>Modifying in-memory state</h2><p>Sometimes a test would change a setting in a Spring singleton (say, changing a
+flag to enable a feature), and wasn&rsquo;t resetting it to its default. Then another
+test class using the same application context would run, and implicitly rely on
+the default value being used, failing.</p><p>A variation of this was a test modifying a <code>ThreadLocal</code> variable and not
+resetting it, making a later test fail because it was implicitly relying on such
+variable being null when it wasn&rsquo;t.</p><h2 id=using-a-static-reference-of-the-applicationcontext>Using a static reference of the ApplicationContext</h2><p>We had a static reference to the <code>ApplicationContext</code>, which was meant to be
+used in classes that couldn&rsquo;t be Spring beans, that is classes where we couldn&rsquo;t
+rely on Spring wiring the needed dependencies <sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup> (think for instance a Log4J2
+plugin such as a custom appender). Unfortunately, throughout the years this was
+misused, used in places where it shouldn&rsquo;t have been. Then weird things would
+happen with tests. A typical example would be 3 tests running as follows:</p><ol><li>Test1, using ApplicationContext A.</li><li>Test2, using ApplicationContext B.</li><li>Test3, using ApplicationContext A.</li></ol><p>When Test1 initialized the application context, it would set the static
+reference; then Test2 would do the same. Test3 wouldn&rsquo;t, though, because it
+didn&rsquo;t initialize the application context, it reused the one that had already
+been initialized before (because Spring caches it). Then Test3 would try to use
+a bean from a different application context, leading to errors.</p><p>Even when later this was changed so that each test would reset the static
+reference, it was not enough, as some classes were getting a dependency from
+the application context and caching it, or storing it in a <code>static final</code> field,
+which would still lead to a test using a bean from the wrong application
+context.</p><p>All this is of course avoided by following standard dependency injection
+recommendations.</p><h3 id=metadataextractorintegrator>MetadataExtractorIntegrator</h3><p>In one of his articles, Vlad Mihalcea shows <a href=https://vladmihalcea.com/how-to-get-access-to-database-table-metadata-with-hibernate-5/>how to get access to database metadata</a>
+in Hibernate 5. The idea is registering a Hibernate <code>Integrator</code> and reading the
+<code>SessionFactory</code>'s metadata. In that article the class is a singleton, keeping
+the sole instance in a <code>static final</code> field.</p><p>As described, that works fine in production, but can cause issues during
+testing. Different application contexts can have different Hibernate entities
+(depending on which entities are registered while building the
+<code>SessionFactory</code>). What I saw happening was again a problem with test running
+order and Spring&rsquo;s application context caching. Again, given:</p><ol><li>Test1, using ApplicationContext A.</li><li>Test2, using ApplicationContext B.</li><li>Test3, using ApplicationContext A.</li></ol><p>If ApplicationContext B had a smaller set of entities, then Test3 could fail because:</p><ol><li>Test1 runs, intializes ApplicationContext A, and the
+MetadataExtractorIntegrator extracts the metadata and keeps it in its
+<code>INSTANCE</code> field.</li><li>Test2 runs, intializes ApplicationContext B, and the
+MetadataExtractorIntegrator extracts the metadata and overwrites the one kept
+on its <code>INSTANCE</code> field.</li><li>Test3 runs, using the cached ApplicationContext A, with the metadata from
+ApplicationContext B. At some point the test requests metadata for an entity
+for which we have no data, since the <code>SessionFactory</code> in ApplicationContext B
+isn&rsquo;t aware of it.</li></ol><p>The fix for this was having a singleton Spring bean which stored the metadata
+read by the <code>MetadataExtractorIntegrator</code>, and having the rest of the code use
+that bean instead of the <code>MetadataExtractorIntegrator</code> <code>INSTANCE</code>. In that way,
+each application context had access to the right metadata.</p><section class=footnotes role=doc-endnotes><hr><ol><li id=fn:1 role=doc-endnote><p>Essentially a mixture of Ambient Context and Service Locator
+anti-patterns, as defined in &ldquo;Dependency Injection: Principles, Practices and Patterns&rdquo;,
+by Steven van Deursen and Mark Seemann. <a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></section></article><div class=paginator><a class=link href=https://contivero.github.io/post/speeding-up-tests/>← prev</a>
+<a></a></div><div class=comment></div></main><footer id=footer><div><span>© 2019</span> - <span>2024</span></div><div><span>Powered by</span>
+<a class=link href=https://gohugo.io/>Hugo</a>
+<span>🍦 Theme</span>
+<a class=link href=https://github.com/queensferryme/hugo-theme-texify>TeXify</a></div><div class=footnote><span><a class=link href=https://creativecommons.org/licenses/by-nc-sa/4.0 target=_blank rel=noopener>CC BY-NC-SA 4.0</a></span></div></footer></div></body></html>
