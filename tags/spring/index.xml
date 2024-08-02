@@ -1,4 +1,112 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Spring on Cristian Ontivero</title><link>https://contivero.github.io/tags/spring/</link><description>Recent content in Spring on Cristian Ontivero</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 26 Apr 2023 07:45:13 +0200</lastBuildDate><atom:link href="https://contivero.github.io/tags/spring/index.xml" rel="self" type="application/rss+xml"/><item><title>Self Proxy Injection Anti-Pattern</title><link>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</link><pubDate>Wed, 26 Apr 2023 07:45:13 +0200</pubDate><guid>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</guid><description>&lt;p>Because of how Spring&amp;rsquo;s implementation of AOP works (i.e. proxies), internal
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Spring on Cristian Ontivero</title><link>https://contivero.github.io/tags/spring/</link><description>Recent content in Spring on Cristian Ontivero</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 01 Aug 2024 00:00:00 +0200</lastBuildDate><atom:link href="https://contivero.github.io/tags/spring/index.xml" rel="self" type="application/rss+xml"/><item><title>Speeding Up Test Suite In Java</title><link>https://contivero.github.io/post/speeding-up-tests/</link><pubDate>Thu, 01 Aug 2024 00:00:00 +0200</pubDate><guid>https://contivero.github.io/post/speeding-up-tests/</guid><description>&lt;p>I once had the chance to speed up a test suite spanning multiple maven projects
+which took over 4 hours to run. The suite had around 8100 tests, many of which
+were integration tests using a Spring &lt;code>ApplicationContext&lt;/code>. I managed to get this
+down to around 1h 20~30 mins, until other priorities prevented further
+reductions.&lt;/p>
+&lt;p>What follows is how this was achieved, and what things to watch out for.&lt;/p>
+&lt;h2 id="using-a-single-jvm-for-the-tests-in-a-project">Using a single JVM for the tests in a project&lt;/h2>
+&lt;p>The very first point is reusing forks in your maven-surefire-plugin and
+maven-failsafe-plugin configurations. This is the default, but many of the
+projects had &lt;code>&amp;lt;reuseForks&amp;gt;false&amp;lt;/reuseForks&amp;gt;&lt;/code>. Using &lt;code>false&lt;/code> means that for each
+test class a new JVM is used. This makes it easier to keep tests isolated, since
+no JVM-global state is preserved (e.g. static variables). The downside is that
+this is costlier than using a single JVM for all tests, and Spring&amp;rsquo;s
+&lt;code>ApplicationContext&lt;/code> caching cannot work. This leads us to the next point.&lt;/p>
+&lt;h2 id="spring-applicationcontext-caching">Spring ApplicationContext caching&lt;/h2>
+&lt;p>By default Spring keeps each application context it needs to create cached, and
+reuses them whenever possible. For two tests to use the same application context
+they not only need to point to the same configuration (using the same
+&lt;code>locations&lt;/code> or &lt;code>classes&lt;/code> in &lt;code>@ContextConfiguration&lt;/code>), but a bunch of other
+things. For instance, if a test specifies a different &lt;code>initializer&lt;/code>, then that
+implies using a different application context (for further details refer to
+&lt;code>MergedContextConfiguration&lt;/code>, which is what Spring uses as key for the map of
+application contexts it uses as cache).&lt;/p>
+&lt;p>Thus, one should try to use the same application context for all tests in a
+project that run under the same JVM. Sometimes a different application context
+makes sense, but the less the better, performance-wise.&lt;/p>
+&lt;h2 id="watch-out-for-jvm-global-state">Watch out for JVM-global state&lt;/h2>
+&lt;p>Once the tests run under the same JVM, global state matters more. As always, we
+need to minimize its usage, and keep it in mind to avoid flaky tests. An obvious
+example is System properties. Another example is EhCache, which supports using
+it as a singleton (e.g. with Hibernate&amp;rsquo;s &lt;code>SingletonEhCacheRegionFactory&lt;/code>, or
+calling &lt;code>CacheManager.create()&lt;/code>).&lt;/p>
+&lt;p>Any JVM singleton carries issues, as changes to the state by one test can affect
+subsequent ones if we don&amp;rsquo;t properly clean up after it. By JVM singleton I mean
+a class using a standard implementation of the Singleton pattern, such as using
+an enum (as recommended by Bloch in Effective Java), or a static field.
+Singleton Spring beans can still be a problem (if they have state), but are a
+bit less susceptible because different &lt;code>ApplicationContexts&lt;/code> can have different
+instances, so at least tests running with different &lt;code>ApplicationContext&lt;/code> won&amp;rsquo;t
+affect each other through that bean.&lt;/p>
+&lt;p>Also, relying on such state complicates running tests in parallel, as then
+if test A passes or not can depend on whether some other test B that also
+modifies the same state runs at the same time or not.&lt;/p>
+&lt;h2 id="watch-out-for-thread-bound-values">Watch out for thread-bound values&lt;/h2>
+&lt;p>When relying on a &lt;code>ThredLocal&lt;/code> value, you need to make sure your tests clear it
+after being done, and tests that depend on it set the appropriate value at the
+beginning, even if this value is the default one (say, null). Both are solutions
+to the same issue: if each test cleans up after using the thread-bound resource,
+then later tests don&amp;rsquo;t need to set the default again, and if other tests set the
+needed value at the start (even if it&amp;rsquo;s the default), then previous tests don&amp;rsquo;t
+need to clean up. Having both is mostly for better resilience, and setting the
+right value at the beginning (even if it&amp;rsquo;s the default) is being explicit about
+a tests prerequisites, so it also works as documentation.&lt;/p>
+&lt;h2 id="reusing-database-between-tests">Reusing database between tests&lt;/h2>
+&lt;p>Starting up a database is costly, even when using an in-memory one such as
+HSQLDB. Using a docker instance of the same DBMS as in production with
+testcontainers is better—and costlier.&lt;/p>
+&lt;p>It thus makes sense from a performance perspective to try to use a single
+database for all tests in a suite. This of course introduces another point
+through which different tests can affect each other. For example, if a test
+creates two instances of an entity in a database, and then asserts that there
+are actually two such instances in there, it can fail if some other test created
+another instance before. This means we cannot:&lt;/p>
+&lt;ol>
+&lt;li>Run assertions about the whole state of a database table (aggregations such
+as count, max or min can be problematic).&lt;/li>
+&lt;li>Run statements that modify the whole state of a table, such as deleting all
+rows.&lt;/li>
+&lt;/ol>
+&lt;p>As a practical example of (2), when initializing the application context, we had
+some logic to create some default entries in the database (if missing) which we
+could later expect to always be there (e.g. default currency, default language,
+etc.) A test that deleted all data for one of these tables ended up corrupting
+subsequent tests that expected such defaults to be in the database, but didn&amp;rsquo;t
+find them (because they reused the &lt;code>ApplicationContext&lt;/code>, so the defaults weren&amp;rsquo;t
+re-created).&lt;/p>
+&lt;p>How should different tests use the same database then? One option is expecting
+each test to clean up after itself. This can work, but is of course error-prone,
+as it&amp;rsquo;s easy for a developer to forget it (or not do it thoroughly enough), and
+end up causing hard-to-track flaky tests. The other side of the same coin is
+expecting each test to make sure the database is in the right state before
+running (i.e. by clearing the needed tables). But this suffers from the same
+downsides.&lt;/p>
+&lt;p>Another frequently used approach is recreating the whole DB when a test starts,
+and dropping the whole DB at the end of it. This can be easier to automatize,
+and then avoids the previously mentioned issue. All three approaches though
+complicate parallelizing tests, since having two tests that need the same
+database table run in parallel can easily lead to race conditions.&lt;/p>
+&lt;p>A better option is randomizing test data. By creating fresh, unique entries
+in the database that are sufficiently random, then&lt;/p>
+&lt;ol>
+&lt;li>Tests are less likely to affect each other. Of course the initial
+restrictions still apply: running aggregation functions on tables or performing
+statements that alter state that other tests need (such as deleting all entries
+in a table) are still problematic. Tests need to run assertions specific to the
+data they create, but this is seldom a problem.&lt;/li>
+&lt;li>There is no need to clean up between tests. Tests can freely pollute the
+database, and some argue this is even more realistic, as it&amp;rsquo;s closer to how it
+would be in production (it&amp;rsquo;s artificial to always have a clean empty database
+for each use-case).&lt;/li>
+&lt;li>Lastly, they are amenable to parallelization, because no clean up is
+performed, and because with sufficiently random data no unique constraint
+should be violated.&lt;/li>
+&lt;/ol>
+&lt;p>To support this, the creation of frequently used entities can be encapsulated in
+some helper classes. JUnit 5 extensions can also reduce a lot of the boilerplate
+(so that registering an extension will create a bunch of randomized entities and
+their needed relations), and there is even some libraries that can simplify this
+further (e.g. instancio).&lt;/p></description></item><item><title>Self Proxy Injection Anti-Pattern</title><link>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</link><pubDate>Wed, 26 Apr 2023 07:45:13 +0200</pubDate><guid>https://contivero.github.io/post/self-proxy-injection-anti-pattern/</guid><description>&lt;p>Because of how Spring&amp;rsquo;s implementation of AOP works (i.e. proxies), internal
 calls to a method in a proxied bean cannot be intercepted. This is a limitation
 of any AOP implementation using dynamic proxies. A way I&amp;rsquo;ve seen used to bypass
 this limitation is having an object with a dependency on itself, so that, for

@@ -1,0 +1,97 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><meta name=author content="Cristian A. Ontivero"><meta name=description content="I once had the chance to speed up a test suite spanning multiple maven projects which took over 4 hours to run. The suite had around 8100 tests, many of which were integration tests using a Spring ApplicationContext. I managed to get this down to around 1h 20~30 mins, until other priorities prevented further reductions.
+What follows is how this was achieved, and what things to watch out for.
+Using a single JVM for the tests in a project The very first point is reusing forks in your maven-surefire-plugin and maven-failsafe-plugin configurations."><link rel=icon href=https://contivero.github.io/favicon.ico><meta name=keywords content="hugo  latex  theme"><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css integrity=sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js integrity=sha384-0fdwu/T/EQMsQlrHCCHoH10pkPLlKA1jL5dFyUOvB3lfeT2540/2g6YgSi2BL14p crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],ignoredTags:['script','noscript','style','textarea','pre','code','option'],throwOnError:false});});</script><meta property="og:title" content="Speeding Up Test Suite In Java"><meta property="og:description" content="I once had the chance to speed up a test suite spanning multiple maven projects which took over 4 hours to run. The suite had around 8100 tests, many of which were integration tests using a Spring ApplicationContext. I managed to get this down to around 1h 20~30 mins, until other priorities prevented further reductions.
+What follows is how this was achieved, and what things to watch out for.
+Using a single JVM for the tests in a project The very first point is reusing forks in your maven-surefire-plugin and maven-failsafe-plugin configurations."><meta property="og:type" content="article"><meta property="og:url" content="https://contivero.github.io/post/speeding-up-tests/"><meta property="article:published_time" content="2024-08-01T00:00:00+02:00"><meta property="article:modified_time" content="2024-08-01T00:00:00+02:00"><link rel=canonical href=https://contivero.github.io/post/speeding-up-tests/><meta itemprop=name content="Speeding Up Test Suite In Java"><meta itemprop=description content="I once had the chance to speed up a test suite spanning multiple maven projects which took over 4 hours to run. The suite had around 8100 tests, many of which were integration tests using a Spring ApplicationContext. I managed to get this down to around 1h 20~30 mins, until other priorities prevented further reductions.
+What follows is how this was achieved, and what things to watch out for.
+Using a single JVM for the tests in a project The very first point is reusing forks in your maven-surefire-plugin and maven-failsafe-plugin configurations."><meta itemprop=datePublished content="2024-08-01T00:00:00+02:00"><meta itemprop=dateModified content="2024-08-01T00:00:00+02:00"><meta itemprop=wordCount content="1188"><meta itemprop=keywords content="Java,Spring,Tests,"><link media=screen rel=stylesheet href=https://contivero.github.io/css/common.css><link media=screen rel=stylesheet href=https://contivero.github.io/css/content.css><title>Speeding Up Test Suite In Java - Cristian Ontivero</title><meta name=twitter:card content="summary"><meta name=twitter:title content="Speeding Up Test Suite In Java"><meta name=twitter:description content="I once had the chance to speed up a test suite spanning multiple maven projects which took over 4 hours to run. The suite had around 8100 tests, many of which were integration tests using a Spring ApplicationContext. I managed to get this down to around 1h 20~30 mins, until other priorities prevented further reductions.
+What follows is how this was achieved, and what things to watch out for.
+Using a single JVM for the tests in a project The very first point is reusing forks in your maven-surefire-plugin and maven-failsafe-plugin configurations."><link rel=stylesheet href=https://contivero.github.io/css/single.css></head><body><div id=wrapper><header id=header><h1><a href=https://contivero.github.io/>Cristian Ontivero</a></h1><nav><span class=nav-bar-item><a class=link href=/>Posts</a></span>
+<span class=nav-bar-item><a class=link href=/post/>Archives</a></span>
+<span class=nav-bar-item><a class=link href=/about/>About</a></span></nav></header><main id=main class=post><h1>Speeding Up Test Suite In Java</h1><div><b>Keywords:</b>
+<a class=link href=https://contivero.github.io/tags/java>#Java</a>
+<a class=link href=https://contivero.github.io/tags/spring>#Spring</a>
+<a class=link href=https://contivero.github.io/tags/tests>#Tests</a></div><article class=content><p>I once had the chance to speed up a test suite spanning multiple maven projects
+which took over 4 hours to run. The suite had around 8100 tests, many of which
+were integration tests using a Spring <code>ApplicationContext</code>. I managed to get this
+down to around 1h 20~30 mins, until other priorities prevented further
+reductions.</p><p>What follows is how this was achieved, and what things to watch out for.</p><h2 id=using-a-single-jvm-for-the-tests-in-a-project>Using a single JVM for the tests in a project</h2><p>The very first point is reusing forks in your maven-surefire-plugin and
+maven-failsafe-plugin configurations. This is the default, but many of the
+projects had <code>&lt;reuseForks>false&lt;/reuseForks></code>. Using <code>false</code> means that for each
+test class a new JVM is used. This makes it easier to keep tests isolated, since
+no JVM-global state is preserved (e.g. static variables). The downside is that
+this is costlier than using a single JVM for all tests, and Spring&rsquo;s
+<code>ApplicationContext</code> caching cannot work. This leads us to the next point.</p><h2 id=spring-applicationcontext-caching>Spring ApplicationContext caching</h2><p>By default Spring keeps each application context it needs to create cached, and
+reuses them whenever possible. For two tests to use the same application context
+they not only need to point to the same configuration (using the same
+<code>locations</code> or <code>classes</code> in <code>@ContextConfiguration</code>), but a bunch of other
+things. For instance, if a test specifies a different <code>initializer</code>, then that
+implies using a different application context (for further details refer to
+<code>MergedContextConfiguration</code>, which is what Spring uses as key for the map of
+application contexts it uses as cache).</p><p>Thus, one should try to use the same application context for all tests in a
+project that run under the same JVM. Sometimes a different application context
+makes sense, but the less the better, performance-wise.</p><h2 id=watch-out-for-jvm-global-state>Watch out for JVM-global state</h2><p>Once the tests run under the same JVM, global state matters more. As always, we
+need to minimize its usage, and keep it in mind to avoid flaky tests. An obvious
+example is System properties. Another example is EhCache, which supports using
+it as a singleton (e.g. with Hibernate&rsquo;s <code>SingletonEhCacheRegionFactory</code>, or
+calling <code>CacheManager.create()</code>).</p><p>Any JVM singleton carries issues, as changes to the state by one test can affect
+subsequent ones if we don&rsquo;t properly clean up after it. By JVM singleton I mean
+a class using a standard implementation of the Singleton pattern, such as using
+an enum (as recommended by Bloch in Effective Java), or a static field.
+Singleton Spring beans can still be a problem (if they have state), but are a
+bit less susceptible because different <code>ApplicationContexts</code> can have different
+instances, so at least tests running with different <code>ApplicationContext</code> won&rsquo;t
+affect each other through that bean.</p><p>Also, relying on such state complicates running tests in parallel, as then
+if test A passes or not can depend on whether some other test B that also
+modifies the same state runs at the same time or not.</p><h2 id=watch-out-for-thread-bound-values>Watch out for thread-bound values</h2><p>When relying on a <code>ThredLocal</code> value, you need to make sure your tests clear it
+after being done, and tests that depend on it set the appropriate value at the
+beginning, even if this value is the default one (say, null). Both are solutions
+to the same issue: if each test cleans up after using the thread-bound resource,
+then later tests don&rsquo;t need to set the default again, and if other tests set the
+needed value at the start (even if it&rsquo;s the default), then previous tests don&rsquo;t
+need to clean up. Having both is mostly for better resilience, and setting the
+right value at the beginning (even if it&rsquo;s the default) is being explicit about
+a tests prerequisites, so it also works as documentation.</p><h2 id=reusing-database-between-tests>Reusing database between tests</h2><p>Starting up a database is costly, even when using an in-memory one such as
+HSQLDB. Using a docker instance of the same DBMS as in production with
+testcontainers is better—and costlier.</p><p>It thus makes sense from a performance perspective to try to use a single
+database for all tests in a suite. This of course introduces another point
+through which different tests can affect each other. For example, if a test
+creates two instances of an entity in a database, and then asserts that there
+are actually two such instances in there, it can fail if some other test created
+another instance before. This means we cannot:</p><ol><li>Run assertions about the whole state of a database table (aggregations such
+as count, max or min can be problematic).</li><li>Run statements that modify the whole state of a table, such as deleting all
+rows.</li></ol><p>As a practical example of (2), when initializing the application context, we had
+some logic to create some default entries in the database (if missing) which we
+could later expect to always be there (e.g. default currency, default language,
+etc.) A test that deleted all data for one of these tables ended up corrupting
+subsequent tests that expected such defaults to be in the database, but didn&rsquo;t
+find them (because they reused the <code>ApplicationContext</code>, so the defaults weren&rsquo;t
+re-created).</p><p>How should different tests use the same database then? One option is expecting
+each test to clean up after itself. This can work, but is of course error-prone,
+as it&rsquo;s easy for a developer to forget it (or not do it thoroughly enough), and
+end up causing hard-to-track flaky tests. The other side of the same coin is
+expecting each test to make sure the database is in the right state before
+running (i.e. by clearing the needed tables). But this suffers from the same
+downsides.</p><p>Another frequently used approach is recreating the whole DB when a test starts,
+and dropping the whole DB at the end of it. This can be easier to automatize,
+and then avoids the previously mentioned issue. All three approaches though
+complicate parallelizing tests, since having two tests that need the same
+database table run in parallel can easily lead to race conditions.</p><p>A better option is randomizing test data. By creating fresh, unique entries
+in the database that are sufficiently random, then</p><ol><li>Tests are less likely to affect each other. Of course the initial
+restrictions still apply: running aggregation functions on tables or performing
+statements that alter state that other tests need (such as deleting all entries
+in a table) are still problematic. Tests need to run assertions specific to the
+data they create, but this is seldom a problem.</li><li>There is no need to clean up between tests. Tests can freely pollute the
+database, and some argue this is even more realistic, as it&rsquo;s closer to how it
+would be in production (it&rsquo;s artificial to always have a clean empty database
+for each use-case).</li><li>Lastly, they are amenable to parallelization, because no clean up is
+performed, and because with sufficiently random data no unique constraint
+should be violated.</li></ol><p>To support this, the creation of frequently used entities can be encapsulated in
+some helper classes. JUnit 5 extensions can also reduce a lot of the boilerplate
+(so that registering an extension will create a bunch of randomized entities and
+their needed relations), and there is even some libraries that can simplify this
+further (e.g. instancio).</p></article><div class=paginator><a class=link href=https://contivero.github.io/post/class-as-alternative-to-parameter-threading/>← prev</a>
+<a></a></div><div class=comment></div></main><footer id=footer><div><span>© 2019</span> - <span>2024</span></div><div><span>Powered by</span>
+<a class=link href=https://gohugo.io/>Hugo</a>
+<span>🍦 Theme</span>
+<a class=link href=https://github.com/queensferryme/hugo-theme-texify>TeXify</a></div><div class=footnote><span><a class=link href=https://creativecommons.org/licenses/by-nc-sa/4.0 target=_blank rel=noopener>CC BY-NC-SA 4.0</a></span></div></footer></div></body></html>
