@@ -17,12 +17,14 @@ from my IDE. Even reproducing the execution order of the tests as a test suite
 wouldn&rsquo;t trigger the problem. Running the tests with maven though did cause it
 to fail.</p><p>Unfortunately the assertion&rsquo;s error message wasn&rsquo;t good, but improving it was
 enough to pinpoint the issue. After switching the assertion to use AssertJ,
-the error was something as follows:</p><blockquote><p>Expecting map:
-{&ldquo;$jacocoData"=[true, false, true, false, true, false, true], &ldquo;field1"="value1&rdquo;, &ldquo;field2"=123, &ldquo;field3"=true}
-to contain only:
-[&ldquo;field1"="value1&rdquo;, &ldquo;field3"=true, &ldquo;field2"=123]
-but the following map entries were unexpected:
-[&ldquo;$jacocoData"=[true, false, true, false, true, false, true]]</p></blockquote><p>We had recently added Jacoco to our build for code coverage. The problem was
+the error was something as follows:</p><pre>
+    Expecting map:
+      {"$jacocoData"=[true, false, true, false, true, false, true], "field1"="value1", "field2"=123, "field3"=true}
+    to contain only:
+      ["field1"="value1", "field3"=true, "field2"=123]
+    but the following map entries were unexpected:
+      ["$jacocoData"=[true, false, true, false, true, false, true]]
+</pre><p>We had recently added Jacoco to our build for code coverage. The problem was
 that we were using reflection to get the declared fields of a class, and when
 running the tests with Jacoco for code coverage, Jacoco adds a synthetic field
 to the class named $jacocoData, which was making the assertion fail. The
@@ -133,7 +135,7 @@ reference, it was not enough, as some classes were getting a dependency from
 the application context and caching it, or storing it in a <code>static final</code> field,
 which would still lead to a test using a bean from the wrong application
 context.</p><p>All this is of course avoided by following standard dependency injection
-recommendations.</p><h3 id=metadataextractorintegrator>MetadataExtractorIntegrator</h3><p>In one of his articles, Vlad Mihalcea shows <a href=https://vladmihalcea.com/how-to-get-access-to-database-table-metadata-with-hibernate-5/>how to get access to database metadata</a>
+recommendations.</p><h2 id=metadataextractorintegrator>MetadataExtractorIntegrator</h2><p>In one of his articles, Vlad Mihalcea shows <a href=https://vladmihalcea.com/how-to-get-access-to-database-table-metadata-with-hibernate-5/>how to get access to database metadata</a>
 in Hibernate 5. The idea is registering a Hibernate <code>Integrator</code> and reading the
 <code>SessionFactory</code>'s metadata. In that article the class is a singleton, keeping
 the sole instance in a <code>static final</code> field.</p><p>As described, that works fine in production, but can cause issues during

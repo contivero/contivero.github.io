@@ -10,14 +10,14 @@ to fail.&lt;/p>
 &lt;p>Unfortunately the assertion&amp;rsquo;s error message wasn&amp;rsquo;t good, but improving it was
 enough to pinpoint the issue. After switching the assertion to use AssertJ,
 the error was something as follows:&lt;/p>
-&lt;blockquote>
-&lt;p>Expecting map:
-{&amp;ldquo;$jacocoData&amp;quot;=[true, false, true, false, true, false, true], &amp;ldquo;field1&amp;quot;=&amp;quot;value1&amp;rdquo;, &amp;ldquo;field2&amp;quot;=123, &amp;ldquo;field3&amp;quot;=true}
+&lt;pre>
+Expecting map:
+{"$jacocoData"=[true, false, true, false, true, false, true], "field1"="value1", "field2"=123, "field3"=true}
 to contain only:
-[&amp;ldquo;field1&amp;quot;=&amp;quot;value1&amp;rdquo;, &amp;ldquo;field3&amp;quot;=true, &amp;ldquo;field2&amp;quot;=123]
+["field1"="value1", "field3"=true, "field2"=123]
 but the following map entries were unexpected:
-[&amp;ldquo;$jacocoData&amp;quot;=[true, false, true, false, true, false, true]]&lt;/p>
-&lt;/blockquote>
+["$jacocoData"=[true, false, true, false, true, false, true]]
+&lt;/pre>
 &lt;p>We had recently added Jacoco to our build for code coverage. The problem was
 that we were using reflection to get the declared fields of a class, and when
 running the tests with Jacoco for code coverage, Jacoco adds a synthetic field
@@ -178,7 +178,7 @@ which would still lead to a test using a bean from the wrong application
 context.&lt;/p>
 &lt;p>All this is of course avoided by following standard dependency injection
 recommendations.&lt;/p>
-&lt;h3 id="metadataextractorintegrator">MetadataExtractorIntegrator&lt;/h3>
+&lt;h2 id="metadataextractorintegrator">MetadataExtractorIntegrator&lt;/h2>
 &lt;p>In one of his articles, Vlad Mihalcea shows &lt;a href="https://vladmihalcea.com/how-to-get-access-to-database-table-metadata-with-hibernate-5/">how to get access to database metadata&lt;/a>
 in Hibernate 5. The idea is registering a Hibernate &lt;code>Integrator&lt;/code> and reading the
 &lt;code>SessionFactory&lt;/code>'s metadata. In that article the class is a singleton, keeping
